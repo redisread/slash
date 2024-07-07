@@ -101,7 +101,7 @@ const ImportBookmarkDrawer: React.FC<Props> = (props: Props) => {
 
   return (
     <Drawer anchor="right" open={true} onClose={onClose}>
-      <DialogTitle>导入书签</DialogTitle>
+      <DialogTitle>导入浏览器书签</DialogTitle>
       <ModalClose />
       <DialogContent className="w-full max-w-full">
         <div className="overflow-y-auto w-full mt-2 px-4 pb-4 sm:w-[24rem]">

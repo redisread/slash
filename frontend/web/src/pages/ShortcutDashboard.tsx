@@ -5,13 +5,15 @@ import useLocalStorage from "react-use/lib/useLocalStorage";
 import CreateShortcutDrawer from "@/components/CreateShortcutDrawer";
 import FilterView from "@/components/FilterView";
 import Icon from "@/components/Icon";
+import ImportBookmarkDrawer from "@/components/ImportBookmarkDrawer";
 import ShortcutsContainer from "@/components/ShortcutsContainer";
 import ShortcutsNavigator from "@/components/ShortcutsNavigator";
 import ViewSetting from "@/components/ViewSetting";
 import useLoading from "@/hooks/useLoading";
 import { useShortcutStore, useUserStore, useViewStore } from "@/stores";
 import { getFilteredShortcutList, getOrderedShortcutList } from "@/stores/view";
-import ImportBookmarkDrawer from "@/components/ImportBookmarkDrawer";
+
+
 interface State {
   showCreateShortcutDrawer: boolean;
 }
@@ -48,6 +50,23 @@ const ShortcutDashboard: React.FC = () => {
   };
 
 
+  const exportShortcuts2Json = () => {
+    console.log("shortcutList size: " + shortcutList.length);
+    const jsonString = JSON.stringify(shortcutList, null, 2);
+    const blob = new Blob([jsonString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "slash_data.json";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <>
       <div className="mx-auto max-w-8xl w-full px-4 sm:px-6 md:px-12 pt-4 pb-6 flex flex-col justify-start items-start">
@@ -72,7 +91,11 @@ const ShortcutDashboard: React.FC = () => {
             </Button>
             <Button className="hover:shadow" variant="soft" size="sm" onClick={() => setShowImportBookmarkDrawer(true)}>
               <Icon.Plus className="w-5 h-auto" />
-              <span className="ml-0.5">导入书签</span>
+              <span className="ml-0.5">导入浏览器书签</span>
+            </Button>
+            <Button className="hover:shadow" variant="soft" size="sm" onClick={() => exportShortcuts2Json()}>
+              <Icon.Plus className="w-5 h-auto" />
+              <span className="ml-0.5">导出shortcus</span>
             </Button>
           </div>
         </div>
