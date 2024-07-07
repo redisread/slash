@@ -77,7 +77,8 @@ export const getFilteredShortcutList = (shortcutList: Shortcut[], filter: Filter
         !shortcut.name.toLowerCase().includes(search.toLowerCase()) &&
         !shortcut.description.toLowerCase().includes(search.toLowerCase()) &&
         !shortcut.tags.some((tag) => tag.toLowerCase().includes(search.toLowerCase())) &&
-        !shortcut.link.toLowerCase().includes(search.toLowerCase())
+        !shortcut.link.toLowerCase().includes(search.toLowerCase()) && 
+        !shortcut.title.includes(search)
       ) {
         return false;
       }

@@ -11,7 +11,7 @@ import ViewSetting from "@/components/ViewSetting";
 import useLoading from "@/hooks/useLoading";
 import { useShortcutStore, useUserStore, useViewStore } from "@/stores";
 import { getFilteredShortcutList, getOrderedShortcutList } from "@/stores/view";
-
+import ImportBookmarkDrawer from "@/components/ImportBookmarkDrawer";
 interface State {
   showCreateShortcutDrawer: boolean;
 }
@@ -27,6 +27,8 @@ const ShortcutDashboard: React.FC = () => {
   const [state, setState] = useState<State>({
     showCreateShortcutDrawer: false,
   });
+  const [showImportBookmarkDrawer, setShowImportBookmarkDrawer] = useState(false);
+
   const filter = viewStore.filter;
   const filteredShortcutList = getFilteredShortcutList(shortcutList, filter, currentUser);
   const orderedShortcutList = getOrderedShortcutList(filteredShortcutList, viewStore.order);
@@ -45,6 +47,7 @@ const ShortcutDashboard: React.FC = () => {
     });
   };
 
+
   return (
     <>
       <div className="mx-auto max-w-8xl w-full px-4 sm:px-6 md:px-12 pt-4 pb-6 flex flex-col justify-start items-start">
@@ -62,10 +65,14 @@ const ShortcutDashboard: React.FC = () => {
               onChange={(e) => viewStore.setFilter({ search: e.target.value })}
             />
           </div>
-          <div className="flex flex-row justify-end items-center">
+          <div className="flex flex-row justify-end items-center space-x-2">
             <Button className="hover:shadow" variant="soft" size="sm" onClick={() => setShowCreateShortcutDrawer(true)}>
               <Icon.Plus className="w-5 h-auto" />
               <span className="ml-0.5">{t("common.create")}</span>
+            </Button>
+            <Button className="hover:shadow" variant="soft" size="sm" onClick={() => setShowImportBookmarkDrawer(true)}>
+              <Icon.Plus className="w-5 h-auto" />
+              <span className="ml-0.5">导入书签</span>
             </Button>
           </div>
         </div>
@@ -87,6 +94,9 @@ const ShortcutDashboard: React.FC = () => {
 
       {state.showCreateShortcutDrawer && (
         <CreateShortcutDrawer onClose={() => setShowCreateShortcutDrawer(false)} onConfirm={() => setShowCreateShortcutDrawer(false)} />
+      )}
+      {showImportBookmarkDrawer && (
+        <ImportBookmarkDrawer onClose={() => setShowImportBookmarkDrawer(false)} onConfirm={() => setShowImportBookmarkDrawer(false)} />
       )}
     </>
   );
