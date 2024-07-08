@@ -23,6 +23,7 @@ interface Props {
 interface ImportBookmarkState {
     processedContent: boolean;
     processedBookmarkNums: number;
+    existNum: number;
 }
 
 const ImportBookmarkDrawer: React.FC<Props> = (props: Props) => {
@@ -66,7 +67,7 @@ const ImportBookmarkDrawer: React.FC<Props> = (props: Props) => {
           toast.error("No bookmarks found in the file.");
           return;
         }
-        const shortcuts: Partial<Shortcut>[] = bookmarks.map((bookmark) => {
+        const shortcuts: Shortcut[] = bookmarks.map((bookmark) => {
           return Shortcut.fromPartial({
             name: generateRandomName(),
             title: bookmark.title,
@@ -81,18 +82,33 @@ const ImportBookmarkDrawer: React.FC<Props> = (props: Props) => {
           });
         });
 
-        let total = 0;
+        const existShortcutList = shortcutStore.fetchShortcutList();
+        const existShortcutListMap = new Map<string, Shortcut>();
+
+        existShortcutList.then((existShortcuts) => {
+          existShortcuts.forEach(shortcut => {
+            existShortcutListMap.set(shortcut.link, shortcut);
+          });
+        });
+
+        let existNum = 0;
+        let createNum = 0;
         shortcuts.forEach((shortcut) => {
-            const createShortcut = shortcutStore.createShortcut(shortcut as Shortcut);
-
-            total++;
-
+          // 如果存在则条跳过，针对导入书签的情况
+          if (existShortcutListMap.has(shortcut.link)) {
+            existNum ++;
+          } else {
+            // 不存在才创建
+            const createShortcut = shortcutStore.createShortcut(shortcut);
+            createNum++;
+          }
         });
 
         console.log("res: " + JSON.stringify(shortcuts));
         setPartialState({
           processedContent: true,
-          processedBookmarkNums: total,
+          processedBookmarkNums: createNum,
+          existNum: existNum,
         });
       };
       reader.readAsText(selectedFile);
@@ -110,7 +126,7 @@ const ImportBookmarkDrawer: React.FC<Props> = (props: Props) => {
             <Stack spacing={2}>
               <Typography level="h3">选择文件上传</Typography>
               <Button component="label" role={undefined} tabIndex={-1} variant="outlined" color="neutral">
-                Upload HTML file
+              {selectedFile ? selectedFile.name : "Upload HTML file"}
                 <input type="file" accept=".html" onChange={handleFileChange} style={{ display: "none" }} />
               </Button>
             </Stack>
@@ -121,7 +137,7 @@ const ImportBookmarkDrawer: React.FC<Props> = (props: Props) => {
            (
             <>
             <Divider className="text-gray-500">结果</Divider>
-            <p>导入书签成功 总数:{state.processedBookmarkNums}</p>
+            <p>导入书签成功 处理总数:{state.processedBookmarkNums} 跳过数:{state.existNum}</p>
             </>
            )}
           
@@ -132,7 +148,7 @@ const ImportBookmarkDrawer: React.FC<Props> = (props: Props) => {
           <Button color="neutral" variant="plain" disabled={requestState.isLoading} loading={requestState.isLoading} onClick={onClose}>
             {t("common.cancel")}
           </Button>
-          <Button color="primary" disabled={requestState.isLoading} loading={requestState.isLoading} onClick={handleUpload}>
+          <Button color="primary" disabled={requestState.isLoading || !selectedFile} loading={requestState.isLoading} onClick={handleUpload}>
             解析
           </Button>
         </div>

@@ -9,7 +9,7 @@ chrome.webRequest.onBeforeRequest.addListener(
       if (!param.url) {
         return;
       }
-
+      console.log("url :" ,param.url);
       const shortcutName = getShortcutNameFromUrl(param.url);
       if (shortcutName) {
         const instanceUrl = (await storage.getItem<string>("domain")) || (await storage.getItem<string>("instance_url")) || "";
