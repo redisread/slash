@@ -39,6 +39,7 @@ const ImportBookmarkDrawer: React.FC<Props> = (props: Props) => {
   const [state, setState] = useState<ImportBookmarkState>({
     processedContent: false,
     processedBookmarkNums: 0,
+    existNum:0
   });
 
   // 部分更新
