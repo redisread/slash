@@ -1,7 +1,17 @@
 import { Storage } from "@plasmohq/storage";
-
+import { sendToContentScript } from "@plasmohq/messaging";
 const storage = new Storage();
 const urlRegex = /https?:\/\/s\/(.+)/;
+
+
+chrome.commands.onCommand.addListener((command) => {
+  if (command === "toggle-search-overlay") {
+    console.log("toggle-search-overlay background.ts");
+    sendToContentScript(
+      { name: "toggleSearchOverlay" }
+    );
+  }
+});
 
 chrome.webRequest.onBeforeRequest.addListener(
   (param) => {
