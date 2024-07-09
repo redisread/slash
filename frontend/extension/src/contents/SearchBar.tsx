@@ -32,7 +32,7 @@ export const getRootContainer = () =>
 
 const CentralSearch: FC<PlasmoCSUIProps> = () => {
   const [searchText, setSearchText] = useState("")
-
+  const [isVisible, setIsVisible] = useState(true)
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     // 这里可以添加搜索逻辑
@@ -40,37 +40,18 @@ const CentralSearch: FC<PlasmoCSUIProps> = () => {
   }
 
   return (
-    <div style={{
-      padding: "20px",
-      background: "white",
-      borderRadius: "8px",
-      boxShadow: "0 0 10px rgba(0,0,0,0.1)"
-    }}>
-      <form onSubmit={handleSearch}>
+    <div
+      className={`fixed inset-0 flex flex-col items-center bg-black bg-opacity-50 backdrop-blur-sm z-50 ${
+        isVisible ? "block" : "hidden"
+      }`}
+    >
+      <div className="mt-[20vh] p-5 bg-white rounded-lg shadow-md">
         <input
           type="text"
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          placeholder="输入搜索内容..."
-          style={{
-            padding: "10px",
-            width: "300px",
-            fontSize: "16px"
-          }}
+          placeholder="Search..."
+          className="w-72 p-2 text-base border-2 border-blue-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <button type="submit" style={{
-          marginLeft: "10px",
-          padding: "10px 20px",
-          fontSize: "16px",
-          background: "#4CAF50",
-          color: "white",
-          border: "none",
-          borderRadius: "4px",
-          cursor: "pointer"
-        }}>
-          搜索
-        </button>
-      </form>
+      </div>
     </div>
   )
 }

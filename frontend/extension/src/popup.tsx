@@ -1,5 +1,5 @@
-import { Button, CssVarsProvider, Divider, IconButton } from "@mui/joy";
-import { useEffect } from "react";
+import { Button, Input, CssVarsProvider, Divider, IconButton } from "@mui/joy";
+import { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import CreateShortcutButton from "@/components/CreateShortcutButton";
 import Icon from "@/components/Icon";
@@ -7,6 +7,7 @@ import Logo from "@/components/Logo";
 import PullShortcutsButton from "@/components/PullShortcutsButton";
 import ShortcutsContainer from "@/components/ShortcutsContainer";
 import { useShortcutStore } from "@/stores";
+import Dropdown from "./components/Dropdown";
 import { StorageContextProvider, useStorageContext } from "./context";
 import useColorTheme from "./hooks/useColorTheme";
 import "./style.css";
@@ -17,6 +18,9 @@ const IndexPopup = () => {
   const shortcutStore = useShortcutStore();
   const shortcuts = shortcutStore.getShortcutList();
   const isInitialized = context.instanceUrl && context.accessToken;
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSection, setSelectedSection] = useState("Shortcuts");
 
   useEffect(() => {
     if (!isInitialized) {
@@ -43,57 +47,100 @@ const IndexPopup = () => {
           <span className="">Slash</span>
           {isInitialized && (
             <>
-              <span className="mx-1 text-gray-400">/</span>
-              <span>Shortcuts</span>
-              <span className="text-gray-500 mr-0.5">({shortcuts.length})</span>
-              <PullShortcutsButton />
+              <span className="font-mono opacity-60 mx-1 dark:text-gray-400">/</span>
+              <Dropdown
+                trigger={
+                  <button className="flex flex-row justify-end items-center cursor-pointer">
+                    <span className="dark:text-gray-400">{selectedSection}</span>
+                    <Icon.ChevronsUpDown className="ml-1 w-4 h-auto text-gray-600 dark:text-gray-400" />
+                  </button>
+                }
+                actionsClassName="!w-36 -left-4 z-50"
+                actions={
+                  <>
+                    <IconButton
+                      className="w-full px-2 flex flex-row justify-start items-center text-left dark:text-gray-400 leading-8 cursor-pointer rounded hover:bg-gray-100 dark:hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:opacity-60"
+                      onClick={() => setSelectedSection("Shortcuts")}
+                    >
+                      <Icon.SquareSlash className="w-5 h-auto mr-2 opacity-70" /> Shortcuts
+                    </IconButton>
+                    <IconButton
+                      className="w-full px-2 flex flex-row justify-start items-center text-left dark:text-gray-400 leading-8 cursor-pointer rounded hover:bg-gray-100 dark:hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:opacity-60"
+                      onClick={() => setSelectedSection("Search")}
+                    >
+                      <Icon.Search className="w-5 h-auto mr-2 opacity-70" /> Search
+                    </IconButton>
+                  </>
+                }
+              ></Dropdown>
+              {selectedSection === "Shortcuts" && (
+                <>
+                  <span className="text-gray-500 mr-0.5">({shortcuts.length})</span>
+                  <PullShortcutsButton />
+                </>
+              )}
             </>
           )}
         </div>
-        <div>{isInitialized && <CreateShortcutButton />}</div>
+        <div>{isInitialized && selectedSection === "Shortcuts" && <CreateShortcutButton />}</div>
       </div>
 
       <div className="w-full mt-4">
         {isInitialized ? (
-          <>
-            {shortcuts.length !== 0 ? (
-              <ShortcutsContainer />
-            ) : (
-              <div className="w-full flex flex-col justify-center items-center">
-                <p>No shortcut found.</p>
-              </div>
-            )}
-
-            <Divider className="!mt-4 !mb-2 opacity-40" />
-
-            <div className="w-full flex flex-row justify-between items-center mb-2">
-              <div className="flex flex-row justify-start items-center">
-                <IconButton size="sm" variant="plain" color="neutral" onClick={handleSettingButtonClick}>
-                  <Icon.Settings className="w-5 h-auto text-gray-500 dark:text-gray-400" />
-                </IconButton>
-                <IconButton
-                  size="sm"
-                  variant="plain"
-                  color="neutral"
-                  component="a"
-                  href="https://github.com/yourselfhosted/slash"
-                  target="_blank"
-                >
-                  <Icon.Github className="w-5 h-auto text-gray-500 dark:text-gray-400" />
-                </IconButton>
-              </div>
-              <div className="flex flex-row justify-end items-center">
-                <a
-                  className="text-sm flex flex-row justify-start items-center underline text-blue-600 hover:opacity-80"
-                  href={context.instanceUrl}
-                  target="_blank"
-                >
-                  <span className="mr-1">Go to my Slash</span>
-                  <Icon.ExternalLink className="w-4 h-auto" />
-                </a>
-              </div>
+          selectedSection === "Search" ? (
+            <div className="flex flex-row justify-start items-center">
+              <Input
+                className="w-full mr-3 mb-4"
+                type="text"
+                size="sm"
+                placeholder="Search..."
+                startDecorator={<Icon.Search className="w-4 h-auto" />}
+                value={searchTerm}
+                autoFocus
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-          </>
+          ) : (
+            <>
+              {shortcuts.length !== 0 ? (
+                <ShortcutsContainer />
+              ) : (
+                <div className="w-full flex flex-col justify-center items-center">
+                  <p>No shortcut found.</p>
+                </div>
+              )}
+
+              <Divider className="!mt-4 !mb-2 opacity-40" />
+
+              <div className="w-full flex flex-row justify-between items-center mb-2">
+                <div className="flex flex-row justify-start items-center">
+                  <IconButton size="sm" variant="plain" color="neutral" onClick={handleSettingButtonClick}>
+                    <Icon.Settings className="w-5 h-auto text-gray-500 dark:text-gray-400" />
+                  </IconButton>
+                  <IconButton
+                    size="sm"
+                    variant="plain"
+                    color="neutral"
+                    component="a"
+                    href="https://github.com/yourselfhosted/slash"
+                    target="_blank"
+                  >
+                    <Icon.Github className="w-5 h-auto text-gray-500 dark:text-gray-400" />
+                  </IconButton>
+                </div>
+                <div className="flex flex-row justify-end items-center">
+                  <a
+                    className="text-sm flex flex-row justify-start items-center underline text-blue-600 hover:opacity-80"
+                    href={context.instanceUrl}
+                    target="_blank"
+                  >
+                    <span className="mr-1">Go to my Slash</span>
+                    <Icon.ExternalLink className="w-4 h-auto" />
+                  </a>
+                </div>
+              </div>
+            </>
+          )
         ) : (
           <div className="w-full flex flex-col justify-start items-center">
             <Icon.Cookie strokeWidth={1} className="w-20 h-auto mb-4 text-gray-400" />
