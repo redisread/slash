@@ -61,8 +61,8 @@
     "commands": {
       "toggle-search-overlay": {
         "suggested_key": {
-          "default": "Alt+U",
-          "mac": "Alt+U"
+        "default": "Ctrl+Shift+U",
+        "mac": "Command+Shift+U"
         },
         "description": "Toggle search overlay"
       }
