@@ -16,11 +16,13 @@ const urlRegex = /https?:\/\/s\/(.+)/;
 // });
 
 
+
+
 chrome.commands.onCommand.addListener((command) => {
-  if (command === "toggle-search-overlay") {
-    sendToContentScript(
-      { name: "toggleSearchOverlay", body: {} }
-    );
+  if (command === "open-search") {
+    console.log("open-search background.ts");
+    storage.set("openSearch", true);
+    chrome.action.openPopup();
   }
 })
 

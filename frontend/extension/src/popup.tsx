@@ -11,6 +11,9 @@ import Dropdown from "./components/Dropdown";
 import { StorageContextProvider, useStorageContext } from "./context";
 import useColorTheme from "./hooks/useColorTheme";
 import "./style.css";
+import { Storage } from "@plasmohq/storage"
+
+const storage = new Storage()
 
 const IndexPopup = () => {
   useColorTheme();
@@ -29,6 +32,14 @@ const IndexPopup = () => {
 
     shortcutStore.fetchShortcutList(context.instanceUrl, context.accessToken);
   }, [isInitialized]);
+
+  useEffect(() => {
+    const shouldOpenSearch =  storage.get("openSearch");
+    if (shouldOpenSearch) {
+      setSelectedSection("Search");
+      storage.remove("openSearch");
+    }
+  },[]);
 
   const handleSettingButtonClick = () => {
     chrome.runtime.openOptionsPage();
