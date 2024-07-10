@@ -17,12 +17,10 @@ const urlRegex = /https?:\/\/s\/(.+)/;
 
 
 
-
 chrome.commands.onCommand.addListener((command) => {
   if (command === "open-search") {
     console.log("open-search background.ts");
-    storage.set("openSearch", true);
-    chrome.action.openPopup();
+    chrome.action.openPopup(() => {storage.set("openSearch", true)});
   }
 })
 

@@ -1,5 +1,6 @@
 import { Button, Input, CssVarsProvider, Divider, IconButton } from "@mui/joy";
-import { useEffect, useState } from "react";
+import { Storage } from "@plasmohq/storage";
+import { useEffect, useState ,useRef} from "react";
 import { Toaster } from "react-hot-toast";
 import CreateShortcutButton from "@/components/CreateShortcutButton";
 import Icon from "@/components/Icon";
@@ -8,12 +9,14 @@ import PullShortcutsButton from "@/components/PullShortcutsButton";
 import ShortcutsContainer from "@/components/ShortcutsContainer";
 import { useShortcutStore } from "@/stores";
 import Dropdown from "./components/Dropdown";
+import ShortcutView from "./components/ShortcutView";
 import { StorageContextProvider, useStorageContext } from "./context";
 import useColorTheme from "./hooks/useColorTheme";
 import "./style.css";
-import { Storage } from "@plasmohq/storage"
+import type { KeyboardEvent } from 'react';
+import { Shortcut } from "@/types/proto/api/v1/shortcut_service";
 
-const storage = new Storage()
+const storage = new Storage();
 
 const IndexPopup = () => {
   useColorTheme();
@@ -24,22 +27,68 @@ const IndexPopup = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSection, setSelectedSection] = useState("Shortcuts");
+  const [searchShortcuts, setSearchShortcuts] = useState<Shortcut[]>([]);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isInitialized) {
       return;
     }
-
     shortcutStore.fetchShortcutList(context.instanceUrl, context.accessToken);
   }, [isInitialized]);
 
   useEffect(() => {
-    const shouldOpenSearch =  storage.get("openSearch");
+    const shouldOpenSearch = storage.get("openSearch");
     if (shouldOpenSearch) {
       setSelectedSection("Search");
       storage.remove("openSearch");
     }
-  },[]);
+  }, []);
+
+  useEffect(() => {
+    const fetchResults = async () => {
+      // 取消选中
+      setSelectedIndex(-1);
+      if (searchTerm.trim() === "") {
+        setSearchShortcuts([]);
+        return;
+      }
+      try {
+        const searchResult = shortcuts.filter((shortcut) => {
+          return shortcut.title.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase());
+        });
+        setSearchShortcuts(searchResult);
+      } catch (error) {
+        console.error("Error fetching results:", error);
+      }
+    };
+    const debounceTimer = setTimeout(fetchResults, 300);
+    return () => clearTimeout(debounceTimer);
+  }, [searchTerm]);
+
+
+  useEffect(() => {
+    if (selectedIndex >= 0 && resultsRef.current) {
+      const selectedElement = resultsRef.current.children[selectedIndex] as HTMLElement;
+      selectedElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [selectedIndex]);
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      setSelectedIndex(prev => (prev < searchShortcuts.length - 1 ? prev + 1 : prev));
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setSelectedIndex(prev => (prev > 0 ? prev - 1 : prev));
+    } else if (event.key === 'Enter' && selectedIndex !== -1) {
+        event.preventDefault();
+        window.open(searchShortcuts[selectedIndex].link, '_blank');
+      }
+  };
+
+
 
   const handleSettingButtonClick = () => {
     chrome.runtime.openOptionsPage();
@@ -99,7 +148,7 @@ const IndexPopup = () => {
       <div className="w-full mt-4">
         {isInitialized ? (
           selectedSection === "Search" ? (
-            <div className="flex flex-row justify-start items-center">
+            <div className="flex flex-col justify-start items-center">
               <Input
                 className="w-full mr-3 mb-4"
                 type="text"
@@ -109,7 +158,19 @@ const IndexPopup = () => {
                 value={searchTerm}
                 autoFocus
                 onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={handleKeyDown}
               />
+              {searchShortcuts.length !== 0 ? (
+                <div ref={resultsRef} className="w-full flex flex-col justify-start items-start gap-2">
+                  {searchShortcuts.map((shortcut,index) => {
+                    return <ShortcutView key={shortcut.id} shortcut={shortcut} selected={selectedIndex === index}/>;
+                  })}
+                </div>
+              ) : (
+                <div className="w-full flex flex-col justify-center items-center">
+                  <p>No shortcut found.</p>
+                </div>
+              )}
             </div>
           ) : (
             <>
