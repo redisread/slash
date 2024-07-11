@@ -33,12 +33,17 @@ const CreateCollectionDrawer: React.FC<Props> = (props: Props) => {
       visibility: Visibility.PRIVATE,
     }),
   });
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedShortcuts, setSelectedShortcuts] = useState<Shortcut[]>([]);
   const isCreating = isUndefined(collectionId);
   const loadingState = useLoading(!isCreating);
   const requestState = useLoading(false);
   const unselectedShortcuts = shortcutList
     .filter((shortcut) => {
+      if (!( searchTerm === null || searchTerm === undefined || searchTerm.trim() === "")) {
+        return shortcut.title.toLowerCase().includes(searchTerm.toLowerCase())
+        || shortcut.description.toLowerCase().includes(searchTerm.toLowerCase()) ;
+      }
       if (state.collectionCreate.visibility === Visibility.PUBLIC) {
         return shortcut.visibility === Visibility.PUBLIC;
       } else if (state.collectionCreate.visibility === Visibility.WORKSPACE) {
@@ -165,6 +170,11 @@ const CreateCollectionDrawer: React.FC<Props> = (props: Props) => {
     }
   };
 
+  const handleSearchTermInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+    setSearchTerm(e.target.value);
+  };
+
   return (
     <Drawer anchor="right" open={true} onClose={onClose}>
       <DialogTitle>{isCreating ? "Create Collection" : "Edit Collection"}</DialogTitle>
@@ -228,6 +238,14 @@ const CreateCollectionDrawer: React.FC<Props> = (props: Props) => {
               <span className="opacity-60">({selectedShortcuts.length})</span>
               {selectedShortcuts.length === 0 && <span className="ml-2 italic opacity-80 text-sm">(Select a shortcut first)</span>}
             </p>
+            <Input
+              className="w-full"
+              type="text"
+              placeholder="Search for shortcuts"
+              startDecorator={<Icon.Search className="w-4 h-auto" />}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
             <div className="w-full py-1 px-px flex flex-row justify-start items-start flex-wrap overflow-hidden gap-2">
               {selectedShortcuts.map((shortcut) => {
                 return (
