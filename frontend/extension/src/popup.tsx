@@ -25,7 +25,7 @@ const IndexPopup = () => {
   const shortcuts = shortcutStore.getShortcutList();
   const isInitialized = context.instanceUrl && context.accessToken;
 
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedSection, setSelectedSection] = useState("Shortcuts");
   const [searchShortcuts, setSearchShortcuts] = useState<Shortcut[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -55,8 +55,15 @@ const IndexPopup = () => {
         return;
       }
       try {
+        const termList = searchTerm.split(" ");
         const searchResult = shortcuts.filter((shortcut) => {
-          return shortcut.title.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase());
+          const title = shortcut.title.toLocaleLowerCase();
+          for (const t of termList) {
+            if (!title.includes(t.toLocaleLowerCase())) {
+              return false; // 如果title不包含termList中的某个项，立即返回false
+            }
+          }
+          return true; 
         });
         setSearchShortcuts(searchResult);
       } catch (error) {
@@ -84,7 +91,8 @@ const IndexPopup = () => {
       setSelectedIndex(prev => (prev > 0 ? prev - 1 : prev));
     } else if (event.key === 'Enter' && selectedIndex !== -1) {
         event.preventDefault();
-        window.open(searchShortcuts[selectedIndex].link, '_blank');
+        const shortcutLink = `${context.instanceUrl}/s/${searchShortcuts[selectedIndex].name}`;
+        window.open(shortcutLink, '_blank');
       }
   };
 
@@ -175,7 +183,7 @@ const IndexPopup = () => {
           ) : (
             <>
               {shortcuts.length !== 0 ? (
-                <ShortcutsContainer />
+                <ShortcutsContainer limit={10} />
               ) : (
                 <div className="w-full flex flex-col justify-center items-center">
                   <p>No shortcut found.</p>
