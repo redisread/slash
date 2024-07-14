@@ -1,7 +1,9 @@
-import { Button, Input } from "@mui/joy";
+import { Button, Input, Checkbox } from "@mui/joy";
 import { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import useLocalStorage from "react-use/lib/useLocalStorage";
+import { showCommonDialog } from "@/components/Alert";
 import CreateShortcutDrawer from "@/components/CreateShortcutDrawer";
 import FilterView from "@/components/FilterView";
 import Icon from "@/components/Icon";
@@ -13,9 +15,6 @@ import useLoading from "@/hooks/useLoading";
 import { useShortcutStore, useUserStore, useViewStore } from "@/stores";
 import { getFilteredShortcutList, getOrderedShortcutList } from "@/stores/view";
 import { Shortcut } from "@/types/proto/api/v1/shortcut_service";
-import {toast} from "react-hot-toast";
-import { showCommonDialog } from "@/components/Alert";
-
 
 interface State {
   showCreateShortcutDrawer: boolean;
@@ -34,7 +33,7 @@ const ShortcutDashboard: React.FC = () => {
   });
   const [showImportBookmarkDrawer, setShowImportBookmarkDrawer] = useState(false);
   const [isConfirmDelete, setIsConfirmDelete] = useState(false);
-  const [confirmDeleteShortcutIds,setConfirmDeleteShortcutIds] = useState<Set<number>>(new Set());
+  const [confirmDeleteShortcutIds, setConfirmDeleteShortcutIds] = useState<Set<number>>(new Set());
 
   const filter = viewStore.filter;
   const filteredShortcutList = getFilteredShortcutList(shortcutList, filter, currentUser);
@@ -54,9 +53,6 @@ const ShortcutDashboard: React.FC = () => {
     });
   };
 
-
-
-
   const exportShortcuts2Json = () => {
     const jsonString = JSON.stringify(shortcutList, null, 2);
     const blob = new Blob([jsonString], { type: "application/json" });
@@ -73,7 +69,6 @@ const ShortcutDashboard: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-
   const handleExportShortcuts2Json = () => {
     if (shortcutList && shortcutList.length > 0) {
       const total = shortcutList.length;
@@ -86,11 +81,10 @@ const ShortcutDashboard: React.FC = () => {
           toast.success(`成功导出${total}个Slash!`);
         },
       });
-      return ;
-    } 
+      return;
+    }
     toast.error(`没有需要导出的shortcuts`);
-  }
-
+  };
 
   const handleDeleteShortcutButtonClick = () => {
     if (confirmDeleteShortcutIds && confirmDeleteShortcutIds.size > 0) {
@@ -102,12 +96,21 @@ const ShortcutDashboard: React.FC = () => {
         onConfirm: async () => {
           confirmDeleteShortcutIds.forEach((id) => {
             shortcutStore.deleteShortcut(id);
-          })
+          });
           toast.success(`成功删除${total}个Slash!`);
+          setIsConfirmDelete(false);
         },
       });
     } else {
       toast.error(`没有需要删除的slash`);
+    }
+  };
+
+  const handleFullDeleteCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (confirmDeleteShortcutIds.size > 0 && confirmDeleteShortcutIds.size === orderedShortcutList.length) {
+      setConfirmDeleteShortcutIds(new Set());
+    } else {
+      setConfirmDeleteShortcutIds(new Set(orderedShortcutList.map((shortcut) => shortcut.id)));
     }
   };
 
@@ -119,6 +122,12 @@ const ShortcutDashboard: React.FC = () => {
       newSet.add(shortcut.id);
     }
     setConfirmDeleteShortcutIds(newSet);
+  };
+
+
+  const handleDeleteConfirmButtonClick = () => {
+    setIsConfirmDelete(true);
+    setConfirmDeleteShortcutIds(new Set());
   }
 
 
@@ -152,25 +161,47 @@ const ShortcutDashboard: React.FC = () => {
               <Icon.Plus className="w-5 h-auto" />
               <span className="ml-0.5">导出shortcuts</span>
             </Button>
-            {
-              isConfirmDelete ? (
-                <>
-                  <Button className="hover:shadow" color="danger" variant='solid' size="sm" onClick={() => { handleDeleteShortcutButtonClick(); }}>
-                    <Icon.Minus className="w-5 h-auto" />
-                    <span className="ml-0.5">确认删除</span>
-                  </Button>
-                  <Button className="hover:shadow" color="danger" variant="soft" size="sm" onClick={() => setIsConfirmDelete(false)}>
-                    <Icon.Minus className="w-5 h-auto" />
-                    <span className="ml-0.5">取消</span>
-                  </Button>
-                </>
-              ) : (
-                <Button className="hover:shadow" color="danger" variant='soft' size="sm" onClick={() => { setIsConfirmDelete(true)}}>
+            {isConfirmDelete ? (
+              <>
+                <Button
+                  className="hover:shadow"
+                  color="danger"
+                  variant="solid"
+                  size="sm"
+                  onClick={() => {
+                    handleDeleteShortcutButtonClick();
+                  }}
+                >
                   <Icon.Minus className="w-5 h-auto" />
-                  <span className="ml-0.5">批量删除</span>
+                  <span className="ml-0.5">确认删除</span>
                 </Button>
-              )
-            }
+                <Checkbox
+                  color="danger"
+                  label="全选"
+                  onChange={(e) => {
+                    handleFullDeleteCheckboxChange(e);
+                  }}
+                  checked={confirmDeleteShortcutIds.size > 0 && confirmDeleteShortcutIds.size === orderedShortcutList.length}
+                />
+                <Button className="hover:shadow" color="danger" variant="soft" size="sm" onClick={() => setIsConfirmDelete(false)}>
+                  <Icon.Minus className="w-5 h-auto" />
+                  <span className="ml-0.5">取消</span>
+                </Button>
+              </>
+            ) : (
+              <Button
+                className="hover:shadow"
+                color="danger"
+                variant="soft"
+                size="sm"
+                onClick={() => {
+                  handleDeleteConfirmButtonClick();
+                }}
+              >
+                <Icon.Minus className="w-5 h-auto" />
+                <span className="ml-0.5">批量删除</span>
+              </Button>
+            )}
           </div>
         </div>
         <FilterView />
@@ -185,7 +216,12 @@ const ShortcutDashboard: React.FC = () => {
             <p className="mt-4">No shortcuts found.</p>
           </div>
         ) : (
-          <ShortcutsContainer shortcutList={orderedShortcutList} isDeleteMode={isConfirmDelete} confirmDeleteShortcutIds={confirmDeleteShortcutIds} onShortcutConfirmDelete={handleShortcutConfirmDelete}/>
+          <ShortcutsContainer
+            shortcutList={orderedShortcutList}
+            isDeleteMode={isConfirmDelete}
+            confirmDeleteShortcutIds={confirmDeleteShortcutIds}
+            onShortcutConfirmDelete={handleShortcutConfirmDelete}
+          />
         )}
       </div>
 
@@ -193,7 +229,7 @@ const ShortcutDashboard: React.FC = () => {
         <CreateShortcutDrawer onClose={() => setShowCreateShortcutDrawer(false)} onConfirm={() => setShowCreateShortcutDrawer(false)} />
       )}
       {showImportBookmarkDrawer && (
-        <ImportBookmarkDrawer onClose={() => setShowImportBookmarkDrawer(false)} onConfirm={() => setShowImportBookmarkDrawer(false)} />
+        <ImportBookmarkDrawer onClose={() => setShowImportBookmarkDrawer(false)} onConfirm={() => setShowImportBookmarkDrawer(false)} shortcutList={shortcutList} />
       )}
     </>
   );

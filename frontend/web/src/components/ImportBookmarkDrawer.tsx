@@ -18,6 +18,7 @@ import Icon from "./Icon";
 interface Props {
   onClose: () => void;
   onConfirm?: () => void;
+  shortcutList: Shortcut[];
 }
 
 interface ImportBookmarkState {
@@ -27,7 +28,7 @@ interface ImportBookmarkState {
 }
 
 const ImportBookmarkDrawer: React.FC<Props> = (props: Props) => {
-  const { onClose, onConfirm } = props;
+  const { onClose, onConfirm ,shortcutList} = props;
 
   const { t } = useTranslation();
   const shortcutStore = useShortcutStore();
@@ -83,15 +84,12 @@ const ImportBookmarkDrawer: React.FC<Props> = (props: Props) => {
           });
         });
 
-        const existShortcutList = shortcutStore.fetchShortcutList();
+
         const existShortcutListMap = new Map<string, Shortcut>();
-
-        existShortcutList.then((existShortcuts) => {
-          existShortcuts.forEach(shortcut => {
+        shortcutList.forEach(shortcut => {
             existShortcutListMap.set(shortcut.link, shortcut);
-          });
-        });
 
+        });
         let existNum = 0;
         let createNum = 0;
         shortcuts.forEach((shortcut) => {
@@ -104,13 +102,13 @@ const ImportBookmarkDrawer: React.FC<Props> = (props: Props) => {
             createNum++;
           }
         });
-
-        console.log("res: " + JSON.stringify(shortcuts));
+        console.log("createNum", createNum," existNum", existNum);
         setPartialState({
           processedContent: true,
           processedBookmarkNums: createNum,
           existNum: existNum,
         });
+        toast.success("createNum:"+ createNum+" existNum:"+existNum);
       };
       reader.readAsText(selectedFile);
     }
