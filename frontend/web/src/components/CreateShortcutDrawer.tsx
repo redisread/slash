@@ -10,6 +10,8 @@ import {
   Radio,
   RadioGroup,
   Textarea,
+  Select,
+  Chip
 } from "@mui/joy";
 import classnames from "classnames";
 import { isUndefined, uniq } from "lodash-es";
@@ -17,13 +19,12 @@ import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import useLoading from "@/hooks/useLoading";
-import { useWorkspaceStore, useShortcutStore } from "@/stores";
+import { useWorkspaceStore, useShortcutStore,useCollectionStore } from "@/stores";
 import { getShortcutUpdateMask } from "@/stores/shortcut";
 import { Visibility } from "@/types/proto/api/v1/common";
 import { Shortcut } from "@/types/proto/api/v1/shortcut_service";
 import { convertVisibilityFromPb } from "@/utils/visibility";
 import Icon from "./Icon";
-
 interface Props {
   shortcutId?: number;
   initialShortcut?: Partial<Shortcut>;
@@ -51,6 +52,7 @@ const CreateShortcutDrawer: React.FC<Props> = (props: Props) => {
   });
   const shortcutStore = useShortcutStore();
   const workspaceStore = useWorkspaceStore();
+  const collectionStore = useCollectionStore();
   const [showOpenGraphMetadata, setShowOpenGraphMetadata] = useState<boolean>(false);
   const shortcutList = shortcutStore.getShortcutList();
   const [tag, setTag] = useState<string>("");
@@ -58,6 +60,8 @@ const CreateShortcutDrawer: React.FC<Props> = (props: Props) => {
   const isCreating = isUndefined(shortcutId);
   const loadingState = useLoading(!isCreating);
   const requestState = useLoading(false);
+  const collectionList = collectionStore.getCollectionList();
+  const selectCollectionList = useState<number[]>([]);
 
   const setPartialState = (partialState: Partial<State>) => {
     setState({
@@ -304,6 +308,7 @@ const CreateShortcutDrawer: React.FC<Props> = (props: Props) => {
               {t(`shortcut.visibility.${convertVisibilityFromPb(state.shortcutCreate.visibility).toLowerCase()}.description`)}
             </p>
           </div>
+
           <Divider className="text-gray-500">More</Divider>
           <div className="w-full flex flex-col justify-start items-start border rounded-md mt-3 overflow-hidden dark:border-zinc-800">
             <div

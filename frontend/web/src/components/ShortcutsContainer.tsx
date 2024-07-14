@@ -7,10 +7,13 @@ import ShortcutView from "./ShortcutView";
 
 interface Props {
   shortcutList: Shortcut[];
+  isDeleteMode: boolean;
+  confirmDeleteShortcutIds: Set<number>;
+  onShortcutConfirmDelete: (shortcut: Shortcut) => void;
 }
 
 const ShortcutsContainer: React.FC<Props> = (props: Props) => {
-  const { shortcutList } = props;
+  const { shortcutList,isDeleteMode,confirmDeleteShortcutIds, onShortcutConfirmDelete} = props;
   const navigateTo = useNavigateTo();
   const viewStore = useViewStore();
   const displayStyle = viewStore.displayStyle || "full";
@@ -28,8 +31,23 @@ const ShortcutsContainer: React.FC<Props> = (props: Props) => {
       )}
     >
       {shortcutList.map((shortcut) => {
-        return <ShortcutItemView key={shortcut.id} shortcut={shortcut} showActions={true} onClick={() => handleShortcutClick(shortcut)} />;
-      })}
+          return (
+            <div key={shortcut.id} className="relative">
+              <ShortcutItemView
+                shortcut={shortcut}
+                showActions={!isDeleteMode}
+                onClick={() => handleShortcutClick(shortcut)}
+              />
+              {isDeleteMode && (
+                <input
+                  type="checkbox"
+                  className="absolute top-1 right-2 w-5 h-5"
+                  checked={confirmDeleteShortcutIds.has(shortcut.id)}
+                  onChange={() => onShortcutConfirmDelete(shortcut)}
+                />
+              )}
+            </div>
+          );      })}
     </div>
   );
 };
