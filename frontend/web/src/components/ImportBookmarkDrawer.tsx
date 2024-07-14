@@ -126,14 +126,14 @@ const ImportBookmarkDrawer: React.FC<Props> = (props: Props) => {
           <Sheet sx={{ maxWidth: 500, margin: "auto", padding: 3 }}>
             <Stack spacing={2}>
               <Typography level="h3">选择文件上传</Typography>
+              <p>url已存在的话默认会跳过</p>
               <Button component="label" role={undefined} tabIndex={-1} variant="outlined" color="neutral">
-              {selectedFile ? selectedFile.name : "Upload HTML file"}
+              {selectedFile ? selectedFile.name : "上传HTML书签内容"}
                 <input type="file" accept=".html" onChange={handleFileChange} style={{ display: "none" }} />
               </Button>
             </Stack>
           </Sheet>
 
-          
           {state.processedContent &&
            (
             <>

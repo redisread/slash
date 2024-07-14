@@ -14,6 +14,7 @@ import { useShortcutStore, useUserStore, useViewStore } from "@/stores";
 import { getFilteredShortcutList, getOrderedShortcutList } from "@/stores/view";
 import { Shortcut } from "@/types/proto/api/v1/shortcut_service";
 import {toast} from "react-hot-toast";
+import { showCommonDialog } from "@/components/Alert";
 
 
 interface State {
@@ -54,8 +55,9 @@ const ShortcutDashboard: React.FC = () => {
   };
 
 
+
+
   const exportShortcuts2Json = () => {
-    console.log("shortcutList size: " + shortcutList.length);
     const jsonString = JSON.stringify(shortcutList, null, 2);
     const blob = new Blob([jsonString], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -72,19 +74,42 @@ const ShortcutDashboard: React.FC = () => {
   };
 
 
-  const handleDelete = () => {
-    let total = 0;
-    if (confirmDeleteShortcutIds && confirmDeleteShortcutIds.size > 0) {
-      total = confirmDeleteShortcutIds.size;
-      confirmDeleteShortcutIds.forEach((id) => {
-        shortcutStore.deleteShortcut(id);
-      })
-    }
-    toast.success(`成功删除${total}个Slash!`);
-    setConfirmDeleteShortcutIds(new Set());
-    setIsConfirmDelete(false);
+  const handleExportShortcuts2Json = () => {
+    if (shortcutList && shortcutList.length > 0) {
+      const total = shortcutList.length;
+      showCommonDialog({
+        title: "export Shortcut",
+        content: `Are you sure to export ${total} shortcuts? You cannot undo this action.`,
+        style: "primary",
+        onConfirm: async () => {
+          exportShortcuts2Json();
+          toast.success(`成功导出${total}个Slash!`);
+        },
+      });
+      return ;
+    } 
+    toast.error(`没有需要导出的shortcuts`);
   }
 
+
+  const handleDeleteShortcutButtonClick = () => {
+    if (confirmDeleteShortcutIds && confirmDeleteShortcutIds.size > 0) {
+      const total = confirmDeleteShortcutIds.size;
+      showCommonDialog({
+        title: "Delete Shortcut",
+        content: `Are you sure to delete ${total} shortcuts? You cannot undo this action.`,
+        style: "danger",
+        onConfirm: async () => {
+          confirmDeleteShortcutIds.forEach((id) => {
+            shortcutStore.deleteShortcut(id);
+          })
+          toast.success(`成功删除${total}个Slash!`);
+        },
+      });
+    } else {
+      toast.error(`没有需要删除的slash`);
+    }
+  };
 
   const handleShortcutConfirmDelete = (shortcut: Shortcut) => {
     let newSet = new Set(confirmDeleteShortcutIds);
@@ -123,14 +148,14 @@ const ShortcutDashboard: React.FC = () => {
               <Icon.Plus className="w-5 h-auto" />
               <span className="ml-0.5">导入浏览器书签</span>
             </Button>
-            <Button className="hover:shadow" variant="soft" size="sm" onClick={() => exportShortcuts2Json()}>
+            <Button className="hover:shadow" variant="soft" size="sm" onClick={() => handleExportShortcuts2Json()}>
               <Icon.Plus className="w-5 h-auto" />
-              <span className="ml-0.5">导出shortcus</span>
+              <span className="ml-0.5">导出shortcuts</span>
             </Button>
             {
               isConfirmDelete ? (
                 <>
-                  <Button className="hover:shadow" color="danger" variant='solid' size="sm" onClick={() => { handleDelete(); }}>
+                  <Button className="hover:shadow" color="danger" variant='solid' size="sm" onClick={() => { handleDeleteShortcutButtonClick(); }}>
                     <Icon.Minus className="w-5 h-auto" />
                     <span className="ml-0.5">确认删除</span>
                   </Button>
@@ -142,7 +167,7 @@ const ShortcutDashboard: React.FC = () => {
               ) : (
                 <Button className="hover:shadow" color="danger" variant='soft' size="sm" onClick={() => { setIsConfirmDelete(true)}}>
                   <Icon.Minus className="w-5 h-auto" />
-                  <span className="ml-0.5">删除</span>
+                  <span className="ml-0.5">批量删除</span>
                 </Button>
               )
             }
