@@ -15,9 +15,12 @@ import useLoading from "@/hooks/useLoading";
 import { useShortcutStore, useUserStore, useViewStore } from "@/stores";
 import { getFilteredShortcutList, getOrderedShortcutList } from "@/stores/view";
 import { Shortcut } from "@/types/proto/api/v1/shortcut_service";
+import BatchUpdateShortcutDrawer from "@/components/BatchUpdateShortcutDrawer";
 
 interface State {
   showCreateShortcutDrawer: boolean;
+  showImportBookmarkDrawer: boolean;
+  showBatchUpdateShortcutDrawer:boolean;
 }
 
 const ShortcutDashboard: React.FC = () => {
@@ -30,8 +33,9 @@ const ShortcutDashboard: React.FC = () => {
   const shortcutList = shortcutStore.getShortcutList();
   const [state, setState] = useState<State>({
     showCreateShortcutDrawer: false,
+    showImportBookmarkDrawer: false,
+    showBatchUpdateShortcutDrawer: false,
   });
-  const [showImportBookmarkDrawer, setShowImportBookmarkDrawer] = useState(false);
   const [isConfirmDelete, setIsConfirmDelete] = useState(false);
   const [confirmDeleteShortcutIds, setConfirmDeleteShortcutIds] = useState<Set<number>>(new Set());
 
@@ -50,6 +54,20 @@ const ShortcutDashboard: React.FC = () => {
     setState({
       ...state,
       showCreateShortcutDrawer: show,
+    });
+  };
+
+  const setShowImportBookmarkDrawer = (show: boolean) => {
+    setState({
+      ...state,
+      showImportBookmarkDrawer: show,
+    });
+  };
+
+  const setShowBatchUpdateShortcutDrawer = (show: boolean) => {
+    setState({
+      ...state,
+      showBatchUpdateShortcutDrawer: show,
     });
   };
 
@@ -155,11 +173,15 @@ const ShortcutDashboard: React.FC = () => {
             </Button>
             <Button className="hover:shadow" variant="soft" size="sm" onClick={() => setShowImportBookmarkDrawer(true)}>
               <Icon.Plus className="w-5 h-auto" />
-              <span className="ml-0.5">导入浏览器书签</span>
+              <span className="ml-0.5">导入</span>
             </Button>
             <Button className="hover:shadow" variant="soft" size="sm" onClick={() => handleExportShortcuts2Json()}>
               <Icon.Plus className="w-5 h-auto" />
-              <span className="ml-0.5">导出shortcuts</span>
+              <span className="ml-0.5">导出</span>
+            </Button>
+            <Button className="hover:shadow" variant="soft" size="sm" onClick={() => setShowBatchUpdateShortcutDrawer(true)}>
+              <Icon.Plus className="w-5 h-auto" />
+              <span className="ml-0.5">批量更新</span>
             </Button>
             {isConfirmDelete ? (
               <>
@@ -228,8 +250,11 @@ const ShortcutDashboard: React.FC = () => {
       {state.showCreateShortcutDrawer && (
         <CreateShortcutDrawer onClose={() => setShowCreateShortcutDrawer(false)} onConfirm={() => setShowCreateShortcutDrawer(false)} />
       )}
-      {showImportBookmarkDrawer && (
+      {state.showImportBookmarkDrawer && (
         <ImportBookmarkDrawer onClose={() => setShowImportBookmarkDrawer(false)} onConfirm={() => setShowImportBookmarkDrawer(false)} shortcutList={shortcutList} />
+      )}
+      {state.showBatchUpdateShortcutDrawer && (
+        <BatchUpdateShortcutDrawer onClose={() => setShowBatchUpdateShortcutDrawer(false)} onConfirm={() => setShowBatchUpdateShortcutDrawer(false)} shortcutList={filteredShortcutList} />
       )}
     </>
   );
