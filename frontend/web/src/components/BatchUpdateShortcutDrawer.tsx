@@ -43,6 +43,8 @@ const BatchUpdateShortcutDrawer: React.FC<Props> = (props: Props) => {
   const [tags, setTags] = useState<string>("");
   const [override, setOverride] = useState<boolean>(false);
 
+  const [deteteTags,setDeleteTags] = useState<string>("");
+
   const handleBatchUpdate = () => {
     if (shortcutList && shortcutList.length > 0) {
         const total = shortcutList.length;
@@ -85,12 +87,63 @@ const BatchUpdateShortcutDrawer: React.FC<Props> = (props: Props) => {
       }
   }
 
+  const handleBatchDelete = () => {
+    if (shortcutList && shortcutList.length > 0) {
+        const tagList = deteteTags.trim().split(" ");
+        const total = shortcutList.length;
+        if (tagList.length === 0) {
+          toast.error("No tags to delete");
+          return;
+        }
+
+        showCommonDialog({
+            title: "update Shortcut for delete tags",
+            content: `Are you sure to delete ${total} shortcuts's tags for [#${tagList.join(", #")}]?`,
+            style: "primary",
+            onConfirm: async () => {
+              shortcutList.forEach(async (shortcut) => {
+                let sTags = new Set<string>(shortcut.tags);
+                for (const tag of tagList) {
+                  sTags.delete(tag);
+                }
+                const newTags = Array.from(sTags);
+                const originShortcut = shortcutStore.getShortcutById(shortcut.id);
+                const updatingShortcut = {
+                    ...shortcut,
+                    id: shortcut.id,
+                    tags: newTags,
+                  };
+                await shortcutStore.updateShortcut(updatingShortcut, getShortcutUpdateMask(originShortcut,updatingShortcut));
+              });
+              toast.success(`成功更新${total}个Slash!`);
+              if (onConfirm) {
+                onConfirm();
+              } else {
+                onClose();
+              }
+            },
+          });
+          return ;
+    }
+    toast.error("No shortcuts to delete tags");
+    if (onConfirm) {
+        onConfirm();
+      } else {
+        onClose();
+      }
+  }
+
   const handleOverideCheckBoxClick = (e: React.ChangeEvent<HTMLInputElement>) => {
     setOverride(e.target.checked);
   }
 
   const handleTagsInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTags(e.target.value);
+  }
+
+
+  const handleDeleteTagsInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDeleteTags(e.target.value);
   }
 
 
@@ -106,6 +159,11 @@ const BatchUpdateShortcutDrawer: React.FC<Props> = (props: Props) => {
             </div>
             <Input placeholder="输入批量更新的标签...(使用空格分隔)" onChange={handleTagsInputChange} value={tags}/>
         </div>
+
+        <div className="overflow-y-auto w-full mt-2 px-4 pb-4 sm:w-[24rem]">
+            <p>删除标签:</p>
+            <Input placeholder="输入批量删除的标签...(使用空格分隔)" onChange={handleDeleteTagsInputChange} value={deteteTags}/>
+        </div>
       </DialogContent>
       <DialogActions>
         <div className="w-full flex flex-row justify-end items-center px-3 py-4 space-x-2">
@@ -113,7 +171,10 @@ const BatchUpdateShortcutDrawer: React.FC<Props> = (props: Props) => {
             {t("common.cancel")}
           </Button>
           <Button color="primary" disabled={requestState.isLoading} loading={requestState.isLoading} onClick={handleBatchUpdate}>
-            更新
+            更新tag
+          </Button>
+          <Button color="danger" disabled={requestState.isLoading} loading={requestState.isLoading} onClick={handleBatchDelete}>
+            删除tag
           </Button>
         </div>
       </DialogActions>
