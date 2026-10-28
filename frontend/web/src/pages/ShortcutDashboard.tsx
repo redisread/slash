@@ -1,26 +1,27 @@
-import { Button, Input, Checkbox } from "@mui/joy";
 import { useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import useLocalStorage from "react-use/lib/useLocalStorage";
+import { toast } from "sonner";
 import { showCommonDialog } from "@/components/Alert";
+import BatchUpdateShortcutDrawer from "@/components/BatchUpdateShortcutDrawer";
 import CreateShortcutDrawer from "@/components/CreateShortcutDrawer";
 import FilterView from "@/components/FilterView";
 import Icon from "@/components/Icon";
 import ImportBookmarkDrawer from "@/components/ImportBookmarkDrawer";
 import ShortcutsContainer from "@/components/ShortcutsContainer";
 import ShortcutsNavigator from "@/components/ShortcutsNavigator";
-import ViewSetting from "@/components/ViewSetting";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import useLoading from "@/hooks/useLoading";
 import { useShortcutStore, useUserStore, useViewStore } from "@/stores";
 import { getFilteredShortcutList, getOrderedShortcutList } from "@/stores/view";
 import { Shortcut } from "@/types/proto/api/v1/shortcut_service";
-import BatchUpdateShortcutDrawer from "@/components/BatchUpdateShortcutDrawer";
 
 interface State {
   showCreateShortcutDrawer: boolean;
   showImportBookmarkDrawer: boolean;
-  showBatchUpdateShortcutDrawer:boolean;
+  showBatchUpdateShortcutDrawer: boolean;
 }
 
 const ShortcutDashboard: React.FC = () => {
@@ -93,7 +94,7 @@ const ShortcutDashboard: React.FC = () => {
       showCommonDialog({
         title: "export Shortcut",
         content: `Are you sure to export ${total} shortcuts? You cannot undo this action.`,
-        style: "primary",
+        style: "default",
         onConfirm: async () => {
           exportShortcuts2Json();
           toast.success(`成功导出${total}个Slash!`);
@@ -124,7 +125,7 @@ const ShortcutDashboard: React.FC = () => {
     }
   };
 
-  const handleFullDeleteCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFullDeleteCheckboxChange = () => {
     if (confirmDeleteShortcutIds.size > 0 && confirmDeleteShortcutIds.size === orderedShortcutList.length) {
       setConfirmDeleteShortcutIds(new Set());
     } else {
@@ -133,7 +134,7 @@ const ShortcutDashboard: React.FC = () => {
   };
 
   const handleShortcutConfirmDelete = (shortcut: Shortcut) => {
-    let newSet = new Set(confirmDeleteShortcutIds);
+    const newSet = new Set(confirmDeleteShortcutIds);
     if (newSet.has(shortcut.id)) {
       newSet.delete(shortcut.id);
     } else {
@@ -142,44 +143,39 @@ const ShortcutDashboard: React.FC = () => {
     setConfirmDeleteShortcutIds(newSet);
   };
 
-
   const handleDeleteConfirmButtonClick = () => {
     setIsConfirmDelete(true);
     setConfirmDeleteShortcutIds(new Set());
-  }
-
+  };
 
   return (
     <>
       <div className="mx-auto max-w-8xl w-full px-4 sm:px-6 md:px-12 pt-4 pb-6 flex flex-col justify-start items-start">
         <ShortcutsNavigator />
-        <div className="w-full flex flex-row justify-between items-center mb-4">
+        <div className="w-full flex flex-row justify-between items-center mb-4 gap-2">
           <div className="flex flex-row justify-start items-center">
             <Input
-              className="w-32 mr-2"
+              className="w-32"
               type="text"
-              size="sm"
               placeholder={t("common.search")}
-              startDecorator={<Icon.Search className="w-4 h-auto" />}
-              endDecorator={<ViewSetting />}
               value={filter.search}
               onChange={(e) => viewStore.setFilter({ search: e.target.value })}
             />
           </div>
-          <div className="flex flex-row justify-end items-center space-x-2">
-            <Button className="hover:shadow" variant="soft" size="sm" onClick={() => setShowCreateShortcutDrawer(true)}>
+          <div className="flex flex-row justify-end items-center flex-wrap gap-2">
+            <Button className="hover:shadow" variant="secondary" size="sm" onClick={() => setShowCreateShortcutDrawer(true)}>
               <Icon.Plus className="w-5 h-auto" />
               <span className="ml-0.5">{t("common.create")}</span>
             </Button>
-            <Button className="hover:shadow" variant="soft" size="sm" onClick={() => setShowImportBookmarkDrawer(true)}>
+            <Button className="hover:shadow" variant="secondary" size="sm" onClick={() => setShowImportBookmarkDrawer(true)}>
               <Icon.Plus className="w-5 h-auto" />
               <span className="ml-0.5">导入</span>
             </Button>
-            <Button className="hover:shadow" variant="soft" size="sm" onClick={() => handleExportShortcuts2Json()}>
+            <Button className="hover:shadow" variant="secondary" size="sm" onClick={() => handleExportShortcuts2Json()}>
               <Icon.Plus className="w-5 h-auto" />
               <span className="ml-0.5">导出</span>
             </Button>
-            <Button className="hover:shadow" variant="soft" size="sm" onClick={() => setShowBatchUpdateShortcutDrawer(true)}>
+            <Button className="hover:shadow" variant="secondary" size="sm" onClick={() => setShowBatchUpdateShortcutDrawer(true)}>
               <Icon.Plus className="w-5 h-auto" />
               <span className="ml-0.5">批量更新</span>
             </Button>
@@ -187,8 +183,7 @@ const ShortcutDashboard: React.FC = () => {
               <>
                 <Button
                   className="hover:shadow"
-                  color="danger"
-                  variant="solid"
+                  variant="destructive"
                   size="sm"
                   onClick={() => {
                     handleDeleteShortcutButtonClick();
@@ -198,14 +193,13 @@ const ShortcutDashboard: React.FC = () => {
                   <span className="ml-0.5">确认删除</span>
                 </Button>
                 <Checkbox
-                  color="danger"
-                  label="全选"
-                  onChange={(e) => {
-                    handleFullDeleteCheckboxChange(e);
+                  aria-label="全选"
+                  onCheckedChange={() => {
+                    handleFullDeleteCheckboxChange();
                   }}
                   checked={confirmDeleteShortcutIds.size > 0 && confirmDeleteShortcutIds.size === orderedShortcutList.length}
                 />
-                <Button className="hover:shadow" color="danger" variant="soft" size="sm" onClick={() => setIsConfirmDelete(false)}>
+                <Button className="hover:shadow" variant="secondary" size="sm" onClick={() => setIsConfirmDelete(false)}>
                   <Icon.Minus className="w-5 h-auto" />
                   <span className="ml-0.5">取消</span>
                 </Button>
@@ -213,8 +207,7 @@ const ShortcutDashboard: React.FC = () => {
             ) : (
               <Button
                 className="hover:shadow"
-                color="danger"
-                variant="soft"
+                variant="secondary"
                 size="sm"
                 onClick={() => {
                   handleDeleteConfirmButtonClick();
@@ -228,14 +221,22 @@ const ShortcutDashboard: React.FC = () => {
         </div>
         <FilterView />
         {loadingState.isLoading ? (
-          <div className="py-12 w-full flex flex-row justify-center items-center opacity-80 dark:text-gray-500">
+          <div className="py-12 w-full flex flex-row justify-center items-center opacity-80 text-muted-foreground">
             <Icon.Loader className="mr-2 w-5 h-auto animate-spin" />
             {t("common.loading")}
           </div>
         ) : orderedShortcutList.length === 0 ? (
-          <div className="py-16 w-full flex flex-col justify-center items-center text-gray-400">
-            <Icon.PackageOpen className="w-16 h-auto" strokeWidth="1" />
-            <p className="mt-4">No shortcuts found.</p>
+          <div className="py-16 w-full flex flex-col justify-center items-center text-muted-foreground">
+            <Icon.PackageOpen size={64} strokeWidth={1} />
+            <p className="mt-2">No shortcuts found.</p>
+            <a
+              className="text-blue-600 border-t border-border text-sm hover:underline flex flex-row justify-center items-center mt-4 pt-2"
+              href="https://github.com/yourselfhosted/slash/blob/main/docs/getting-started/shortcuts.md"
+              target="_blank"
+            >
+              <span>Learn more about shortcuts.</span>
+              <Icon.ExternalLink className="ml-1 w-4 h-auto inline" />
+            </a>
           </div>
         ) : (
           <ShortcutsContainer
@@ -251,10 +252,18 @@ const ShortcutDashboard: React.FC = () => {
         <CreateShortcutDrawer onClose={() => setShowCreateShortcutDrawer(false)} onConfirm={() => setShowCreateShortcutDrawer(false)} />
       )}
       {state.showImportBookmarkDrawer && (
-        <ImportBookmarkDrawer onClose={() => setShowImportBookmarkDrawer(false)} onConfirm={() => setShowImportBookmarkDrawer(false)} shortcutList={shortcutList} />
+        <ImportBookmarkDrawer
+          onClose={() => setShowImportBookmarkDrawer(false)}
+          onConfirm={() => setShowImportBookmarkDrawer(false)}
+          shortcutList={shortcutList}
+        />
       )}
       {state.showBatchUpdateShortcutDrawer && (
-        <BatchUpdateShortcutDrawer onClose={() => setShowBatchUpdateShortcutDrawer(false)} onConfirm={() => setShowBatchUpdateShortcutDrawer(false)} shortcutList={filteredShortcutList} />
+        <BatchUpdateShortcutDrawer
+          onClose={() => setShowBatchUpdateShortcutDrawer(false)}
+          onConfirm={() => setShowBatchUpdateShortcutDrawer(false)}
+          shortcutList={filteredShortcutList}
+        />
       )}
     </>
   );

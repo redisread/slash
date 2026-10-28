@@ -1,5 +1,6 @@
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useState } from "react";
 import Icon from "@/components/Icon";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface Props {
   trigger?: ReactNode;
@@ -10,54 +11,24 @@ interface Props {
 
 const Dropdown: React.FC<Props> = (props: Props) => {
   const { trigger, actions, className, actionsClassName } = props;
-  const [dropdownStatus, setDropdownStatus] = useState(false);
-  const dropdownWrapperRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (dropdownStatus) {
-      const handleClickOutside = (event: MouseEvent) => {
-        if (!dropdownWrapperRef.current?.contains(event.target as Node)) {
-          setDropdownStatus(false);
-        }
-      };
-
-      window.addEventListener("click", handleClickOutside, {
-        capture: true,
-      });
-      return () => {
-        window.removeEventListener("click", handleClickOutside, {
-          capture: true,
-        });
-      };
-    }
-  }, [dropdownStatus]);
-
-  const handleToggleDropdownStatus = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    e.stopPropagation();
-    setDropdownStatus(!dropdownStatus);
-  };
+  const [open, setOpen] = useState(false);
 
   return (
-    <div
-      ref={dropdownWrapperRef}
-      className={`relative flex flex-col justify-start items-start select-none ${className ?? ""}`}
-      onClick={handleToggleDropdownStatus}
-    >
-      {trigger ? (
-        trigger
-      ) : (
-        <button className="flex flex-row justify-center items-center rounded text-gray-400 cursor-pointer hover:text-gray-500">
-          <Icon.MoreVertical className="w-4 h-auto" />
-        </button>
-      )}
-      <div
-        className={`w-auto mt-1 absolute top-full right-0 flex flex-col justify-start items-start bg-white dark:bg-zinc-900 z-1 border dark:border-zinc-800 p-1 rounded-md shadow ${
-          actionsClassName ?? ""
-        } ${dropdownStatus ? "" : "!hidden"}`}
-      >
+    <DropdownMenu open={open} onOpenChange={setOpen}>
+      <DropdownMenuTrigger className={className} asChild>
+        {trigger ? (
+          <div>{trigger}</div>
+        ) : (
+          <button className="flex flex-row justify-center items-center rounded text-muted-foreground hover:text-foreground transition-colors">
+            <Icon.MoreVertical className="w-4 h-auto" />
+          </button>
+        )}
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className={actionsClassName} align="end" onClick={() => setOpen(false)}>
         {actions}
-      </div>
-    </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

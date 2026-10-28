@@ -13,8 +13,6 @@ type Driver interface {
 	GetDB() *sql.DB
 	Close() error
 
-	Migrate(ctx context.Context) error
-
 	// MigrationHistory model related methods.
 	UpsertMigrationHistory(ctx context.Context, upsert *UpsertMigrationHistory) (*MigrationHistory, error)
 	ListMigrationHistories(ctx context.Context, find *FindMigrationHistory) ([]*MigrationHistory, error)
@@ -48,4 +46,5 @@ type Driver interface {
 	// WorkspaceSetting model related methods.
 	UpsertWorkspaceSetting(ctx context.Context, upsert *storepb.WorkspaceSetting) (*storepb.WorkspaceSetting, error)
 	ListWorkspaceSettings(ctx context.Context, find *FindWorkspaceSetting) ([]*storepb.WorkspaceSetting, error)
+	DeleteWorkspaceSetting(ctx context.Context, key storepb.WorkspaceSettingKey) error
 }

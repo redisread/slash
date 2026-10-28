@@ -33,23 +33,19 @@
   "shortcut": {
     "visits": "{{count}} 次访问",
     "visibility": {
-      "private": {
-        "self": "私有的",
-        "description": "仅您可以访问"
-      },
       "workspace": {
         "self": "工作区",
         "description": "工作区成员可以访问"
       },
       "public": {
         "self": "公开的",
-        "description": "对任何人可见"
+        "description": "公开至互联网"
       }
     }
   },
   "filter": {
     "all": "所有",
-    "mine": "我的",
+    "personal": "我的",
     "compact-mode": "紧凑模式",
     "order-by": "排序方式",
     "direction": "方向"
@@ -72,7 +68,6 @@
     },
     "workspace": {
       "self": "系统设置",
-      "custom-style": "自定义样式",
       "enable-user-signup": {
         "self": "启用用户注册",
         "description": "允许其他用户注册新账号"

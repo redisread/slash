@@ -16,7 +16,7 @@ interface UserState {
   getCurrentUser: () => User;
   setCurrentUserId: (id: number) => void;
   createUser: (create: Partial<User>) => Promise<User>;
-  patchUser: (userPatch: Partial<User>) => Promise<void>;
+  patchUser: (userPatch: Partial<User>, updateMask: string[]) => Promise<void>;
   deleteUser: (id: number) => Promise<void>;
 
   // User setting related actions.
@@ -38,7 +38,7 @@ const useUserStore = create<UserState>()((set, get) => ({
     return users;
   },
   fetchCurrentUser: async () => {
-    const { user } = await authServiceClient.getAuthStatus({});
+    const user = await authServiceClient.getAuthStatus({});
     if (!user) {
       throw new Error("User not found");
     }
@@ -53,36 +53,27 @@ const useUserStore = create<UserState>()((set, get) => ({
       return userMap[id] as User;
     }
 
-    const { user } = await userServiceClient.getUser({
+    const user = await userServiceClient.getUser({
       id: id,
     });
-    if (!user) {
-      throw new Error("User not found");
-    }
     userMap[id] = user;
     set(userMap);
     return user;
   },
   createUser: async (userCreate: Partial<User>) => {
-    const { user } = await userServiceClient.createUser({
+    const user = await userServiceClient.createUser({
       user: userCreate,
     });
-    if (!user) {
-      throw new Error("User not found");
-    }
     const userMap = get().userMapById;
     userMap[user.id] = user;
     set(userMap);
     return user;
   },
-  patchUser: async (userPatch: Partial<User>) => {
-    const { user } = await userServiceClient.updateUser({
+  patchUser: async (userPatch: Partial<User>, updateMask: string[]) => {
+    const user = await userServiceClient.updateUser({
       user: userPatch,
-      updateMask: ["email", "nickname"],
+      updateMask: updateMask,
     });
-    if (!user) {
-      throw new Error("User not found");
-    }
     const userMap = get().userMapById;
     userMap[user.id] = user;
     set(userMap);
@@ -110,25 +101,21 @@ const useUserStore = create<UserState>()((set, get) => ({
     });
   },
   fetchUserSetting: async (userId: number) => {
-    const userSetting = (
-      await userSettingServiceClient.getUserSetting({
-        id: userId,
-      })
-    ).userSetting as UserSetting;
+    const userSetting = await userSettingServiceClient.getUserSetting({
+      id: userId,
+    });
     const userSettingMap = get().userSettingMapById;
     userSettingMap[userId] = userSetting;
     set(userSettingMap);
     return userSetting;
   },
   updateUserSetting: async (userSetting: UserSetting, updateMask: string[]) => {
-    const userId = userSetting.id;
-    const updatedUserSetting = (
-      await userSettingServiceClient.updateUserSetting({
-        id: userId,
-        userSetting,
-        updateMask,
-      })
-    ).userSetting as UserSetting;
+    const userId = userSetting.userId;
+    const updatedUserSetting = await userSettingServiceClient.updateUserSetting({
+      id: userId,
+      userSetting,
+      updateMask,
+    });
     const userSettingMap = get().userSettingMapById;
     userSettingMap[userId] = updatedUserSetting;
     set(userSettingMap);

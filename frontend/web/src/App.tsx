@@ -1,13 +1,14 @@
-import { useColorScheme } from "@mui/joy";
+import { useTheme } from "next-themes";
 import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import DemoBanner from "@/components/DemoBanner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { useWorkspaceStore } from "@/stores";
 import useNavigateTo from "./hooks/useNavigateTo";
+import { FeatureType } from "./stores/workspace";
 
 function App() {
   const navigateTo = useNavigateTo();
-  const { mode: colorScheme } = useColorScheme();
+  const { theme: colorScheme } = useTheme();
   const workspaceStore = useWorkspaceStore();
 
   // Redirect to sign up page if no instance owner.
@@ -20,11 +21,14 @@ function App() {
   }, [workspaceStore.profile]);
 
   useEffect(() => {
-    const styleEl = document.createElement("style");
-    styleEl.innerHTML = workspaceStore.setting.customStyle;
-    styleEl.setAttribute("type", "text/css");
-    document.body.insertAdjacentElement("beforeend", styleEl);
-  }, [workspaceStore.setting.customStyle]);
+    const hasCustomBranding = workspaceStore.checkFeatureAvailable(FeatureType.CustomeBranding);
+    if (!hasCustomBranding || !workspaceStore.setting.branding) {
+      return;
+    }
+
+    const favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement;
+    favicon.href = new TextDecoder().decode(workspaceStore.setting.branding);
+  }, [workspaceStore.setting.branding]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -60,10 +64,9 @@ function App() {
   }, [colorScheme]);
 
   return (
-    <>
-      <DemoBanner />
+    <TooltipProvider>
       <Outlet />
-    </>
+    </TooltipProvider>
   );
 }
 

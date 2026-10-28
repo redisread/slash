@@ -2,6 +2,8 @@ package store
 
 import (
 	"context"
+
+	storepb "github.com/yourselfhosted/slash/proto/gen/store"
 )
 
 // Role is the type of a role.
@@ -20,7 +22,7 @@ type User struct {
 	// Standard fields
 	CreatedTs int64
 	UpdatedTs int64
-	RowStatus RowStatus
+	RowStatus storepb.RowStatus
 
 	// Domain specific fields
 	Email        string
@@ -32,7 +34,7 @@ type User struct {
 type UpdateUser struct {
 	ID int32
 
-	RowStatus    *RowStatus
+	RowStatus    *storepb.RowStatus
 	Email        *string
 	Nickname     *string
 	PasswordHash *string
@@ -41,7 +43,7 @@ type UpdateUser struct {
 
 type FindUser struct {
 	ID        *int32
-	RowStatus *RowStatus
+	RowStatus *storepb.RowStatus
 	Email     *string
 	Nickname  *string
 	Role      *Role
@@ -83,7 +85,9 @@ func (s *Store) ListUsers(ctx context.Context, find *FindUser) ([]*User, error) 
 func (s *Store) GetUser(ctx context.Context, find *FindUser) (*User, error) {
 	if find.ID != nil {
 		if cache, ok := s.userCache.Load(*find.ID); ok {
-			return cache.(*User), nil
+			if user, ok := cache.(*User); ok {
+				return user, nil
+			}
 		}
 	}
 

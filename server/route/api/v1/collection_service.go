@@ -6,40 +6,20 @@ import (
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	v1pb "github.com/yourselfhosted/slash/proto/gen/api/v1"
 	storepb "github.com/yourselfhosted/slash/proto/gen/store"
-	"github.com/yourselfhosted/slash/server/metric"
 	"github.com/yourselfhosted/slash/server/service/license"
 	"github.com/yourselfhosted/slash/store"
 )
 
 func (s *APIV1Service) ListCollections(ctx context.Context, _ *v1pb.ListCollectionsRequest) (*v1pb.ListCollectionsResponse, error) {
-	user, err := getCurrentUser(ctx, s.Store)
-	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "failed to get current user: %v", err)
-	}
-	collections, err := s.Store.ListCollections(ctx, &store.FindCollection{
-		CreatorID: &user.ID,
-		VisibilityList: []store.Visibility{
-			store.VisibilityPrivate,
-		},
-	})
+	collections, err := s.Store.ListCollections(ctx, &store.FindCollection{})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get collection list, err: %v", err)
 	}
-
-	sharedCollections, err := s.Store.ListCollections(ctx, &store.FindCollection{
-		VisibilityList: []store.Visibility{
-			store.VisibilityWorkspace,
-			store.VisibilityPublic,
-		},
-	})
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to get collection list, err: %v", err)
-	}
-	collections = append(collections, sharedCollections...)
 
 	convertedCollections := []*v1pb.Collection{}
 	for _, collection := range collections {
@@ -52,7 +32,7 @@ func (s *APIV1Service) ListCollections(ctx context.Context, _ *v1pb.ListCollecti
 	return response, nil
 }
 
-func (s *APIV1Service) GetCollection(ctx context.Context, request *v1pb.GetCollectionRequest) (*v1pb.GetCollectionResponse, error) {
+func (s *APIV1Service) GetCollection(ctx context.Context, request *v1pb.GetCollectionRequest) (*v1pb.Collection, error) {
 	collection, err := s.Store.GetCollection(ctx, &store.FindCollection{
 		ID: &request.Id,
 	})
@@ -65,18 +45,15 @@ func (s *APIV1Service) GetCollection(ctx context.Context, request *v1pb.GetColle
 
 	user, err := getCurrentUser(ctx, s.Store)
 	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "failed to get current user: %v", err)
+		return nil, status.Errorf(codes.Internal, "failed to get current user: %v", err)
 	}
-	if collection.Visibility == storepb.Visibility_PRIVATE && collection.CreatorId != user.ID {
+	if user == nil && collection.Visibility != storepb.Visibility_PUBLIC {
 		return nil, status.Errorf(codes.PermissionDenied, "Permission denied")
 	}
-	response := &v1pb.GetCollectionResponse{
-		Collection: convertCollectionFromStore(collection),
-	}
-	return response, nil
+	return convertCollectionFromStore(collection), nil
 }
 
-func (s *APIV1Service) GetCollectionByName(ctx context.Context, request *v1pb.GetCollectionByNameRequest) (*v1pb.GetCollectionByNameResponse, error) {
+func (s *APIV1Service) GetCollectionByName(ctx context.Context, request *v1pb.GetCollectionByNameRequest) (*v1pb.Collection, error) {
 	collection, err := s.Store.GetCollection(ctx, &store.FindCollection{
 		Name: &request.Name,
 	})
@@ -87,42 +64,35 @@ func (s *APIV1Service) GetCollectionByName(ctx context.Context, request *v1pb.Ge
 		return nil, status.Errorf(codes.NotFound, "collection not found")
 	}
 
-	userID, ok := ctx.Value(userIDContextKey).(int32)
-	if ok {
-		if collection.Visibility == storepb.Visibility_PRIVATE && collection.CreatorId != userID {
-			return nil, status.Errorf(codes.PermissionDenied, "Permission denied")
-		}
-	} else {
-		if collection.Visibility != storepb.Visibility_PUBLIC {
-			return nil, status.Errorf(codes.PermissionDenied, "Permission denied")
-		}
+	user, err := getCurrentUser(ctx, s.Store)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get current user: %v", err)
 	}
-	response := &v1pb.GetCollectionByNameResponse{
-		Collection: convertCollectionFromStore(collection),
+	if user == nil && collection.Visibility != storepb.Visibility_PUBLIC {
+		return nil, status.Errorf(codes.PermissionDenied, "Permission denied")
 	}
-	return response, nil
+	return convertCollectionFromStore(collection), nil
 }
 
-func (s *APIV1Service) CreateCollection(ctx context.Context, request *v1pb.CreateCollectionRequest) (*v1pb.CreateCollectionResponse, error) {
+func (s *APIV1Service) CreateCollection(ctx context.Context, request *v1pb.CreateCollectionRequest) (*v1pb.Collection, error) {
 	if request.Collection.Name == "" || request.Collection.Title == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "name and title are required")
 	}
 
-	if !s.LicenseService.IsFeatureEnabled(license.FeatureTypeUnlimitedAccounts) {
-		collections, err := s.Store.ListCollections(ctx, &store.FindCollection{
-			VisibilityList: []store.Visibility{store.VisibilityWorkspace, store.VisibilityPublic},
-		})
+	if !s.LicenseService.IsFeatureEnabled(license.FeatureTypeUnlimitedCollections) {
+		collections, err := s.Store.ListCollections(ctx, &store.FindCollection{})
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to get collection list, err: %v", err)
 		}
-		if len(collections) >= 5 {
-			return nil, status.Errorf(codes.PermissionDenied, "Maximum number of collections reached")
+		collectionsLimit := int(s.LicenseService.GetSubscription().CollectionsLimit)
+		if len(collections) >= collectionsLimit {
+			return nil, status.Errorf(codes.PermissionDenied, "Maximum number of collections %d reached", collectionsLimit)
 		}
 	}
 
 	user, err := getCurrentUser(ctx, s.Store)
 	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "failed to get current user: %v", err)
+		return nil, status.Errorf(codes.Internal, "failed to get current user: %v", err)
 	}
 	collectionCreate := &storepb.Collection{
 		CreatorId:   user.ID,
@@ -130,28 +100,24 @@ func (s *APIV1Service) CreateCollection(ctx context.Context, request *v1pb.Creat
 		Title:       request.Collection.Title,
 		Description: request.Collection.Description,
 		ShortcutIds: request.Collection.ShortcutIds,
-		Visibility:  storepb.Visibility(request.Collection.Visibility),
+		Visibility:  convertVisibilityToStorepb(request.Collection.Visibility),
 	}
 	collection, err := s.Store.CreateCollection(ctx, collectionCreate)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create collection, err: %v", err)
 	}
 
-	response := &v1pb.CreateCollectionResponse{
-		Collection: convertCollectionFromStore(collection),
-	}
-	metric.Enqueue("collection create")
-	return response, nil
+	return convertCollectionFromStore(collection), nil
 }
 
-func (s *APIV1Service) UpdateCollection(ctx context.Context, request *v1pb.UpdateCollectionRequest) (*v1pb.UpdateCollectionResponse, error) {
+func (s *APIV1Service) UpdateCollection(ctx context.Context, request *v1pb.UpdateCollectionRequest) (*v1pb.Collection, error) {
 	if request.UpdateMask == nil || len(request.UpdateMask.Paths) == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "updateMask is required")
 	}
 
 	user, err := getCurrentUser(ctx, s.Store)
 	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "failed to get current user: %v", err)
+		return nil, status.Errorf(codes.Internal, "failed to get current user: %v", err)
 	}
 	collection, err := s.Store.GetCollection(ctx, &store.FindCollection{
 		ID: &request.Collection.Id,
@@ -180,7 +146,7 @@ func (s *APIV1Service) UpdateCollection(ctx context.Context, request *v1pb.Updat
 		case "shortcut_ids":
 			update.ShortcutIDs = request.Collection.ShortcutIds
 		case "visibility":
-			visibility := store.Visibility(request.Collection.Visibility.String())
+			visibility := convertVisibilityToStorepb(request.Collection.Visibility)
 			update.Visibility = &visibility
 		}
 	}
@@ -189,16 +155,13 @@ func (s *APIV1Service) UpdateCollection(ctx context.Context, request *v1pb.Updat
 		return nil, status.Errorf(codes.Internal, "failed to update collection, err: %v", err)
 	}
 
-	response := &v1pb.UpdateCollectionResponse{
-		Collection: convertCollectionFromStore(collection),
-	}
-	return response, nil
+	return convertCollectionFromStore(collection), nil
 }
 
-func (s *APIV1Service) DeleteCollection(ctx context.Context, request *v1pb.DeleteCollectionRequest) (*v1pb.DeleteCollectionResponse, error) {
+func (s *APIV1Service) DeleteCollection(ctx context.Context, request *v1pb.DeleteCollectionRequest) (*emptypb.Empty, error) {
 	user, err := getCurrentUser(ctx, s.Store)
 	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "failed to get current user: %v", err)
+		return nil, status.Errorf(codes.Internal, "failed to get current user: %v", err)
 	}
 	collection, err := s.Store.GetCollection(ctx, &store.FindCollection{
 		ID: &request.Id,
@@ -219,8 +182,7 @@ func (s *APIV1Service) DeleteCollection(ctx context.Context, request *v1pb.Delet
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to delete collection, err: %v", err)
 	}
-	response := &v1pb.DeleteCollectionResponse{}
-	return response, nil
+	return &emptypb.Empty{}, nil
 }
 
 func convertCollectionFromStore(collection *storepb.Collection) *v1pb.Collection {
@@ -233,6 +195,6 @@ func convertCollectionFromStore(collection *storepb.Collection) *v1pb.Collection
 		Title:       collection.Title,
 		Description: collection.Description,
 		ShortcutIds: collection.ShortcutIds,
-		Visibility:  v1pb.Visibility(collection.Visibility),
+		Visibility:  convertVisibilityFromStorepb(collection.Visibility),
 	}
 }

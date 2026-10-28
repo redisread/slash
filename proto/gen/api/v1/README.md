@@ -4,26 +4,20 @@
 ## Table of Contents
 
 - [api/v1/common.proto](#api_v1_common-proto)
-    - [RowStatus](#slash-api-v1-RowStatus)
+    - [State](#slash-api-v1-State)
     - [Visibility](#slash-api-v1-Visibility)
   
 - [api/v1/user_service.proto](#api_v1_user_service-proto)
     - [CreateUserAccessTokenRequest](#slash-api-v1-CreateUserAccessTokenRequest)
-    - [CreateUserAccessTokenResponse](#slash-api-v1-CreateUserAccessTokenResponse)
     - [CreateUserRequest](#slash-api-v1-CreateUserRequest)
-    - [CreateUserResponse](#slash-api-v1-CreateUserResponse)
     - [DeleteUserAccessTokenRequest](#slash-api-v1-DeleteUserAccessTokenRequest)
-    - [DeleteUserAccessTokenResponse](#slash-api-v1-DeleteUserAccessTokenResponse)
     - [DeleteUserRequest](#slash-api-v1-DeleteUserRequest)
-    - [DeleteUserResponse](#slash-api-v1-DeleteUserResponse)
     - [GetUserRequest](#slash-api-v1-GetUserRequest)
-    - [GetUserResponse](#slash-api-v1-GetUserResponse)
     - [ListUserAccessTokensRequest](#slash-api-v1-ListUserAccessTokensRequest)
     - [ListUserAccessTokensResponse](#slash-api-v1-ListUserAccessTokensResponse)
     - [ListUsersRequest](#slash-api-v1-ListUsersRequest)
     - [ListUsersResponse](#slash-api-v1-ListUsersResponse)
     - [UpdateUserRequest](#slash-api-v1-UpdateUserRequest)
-    - [UpdateUserResponse](#slash-api-v1-UpdateUserResponse)
     - [User](#slash-api-v1-User)
     - [UserAccessToken](#slash-api-v1-UserAccessToken)
   
@@ -33,60 +27,46 @@
   
 - [api/v1/auth_service.proto](#api_v1_auth_service-proto)
     - [GetAuthStatusRequest](#slash-api-v1-GetAuthStatusRequest)
-    - [GetAuthStatusResponse](#slash-api-v1-GetAuthStatusResponse)
     - [SignInRequest](#slash-api-v1-SignInRequest)
-    - [SignInResponse](#slash-api-v1-SignInResponse)
+    - [SignInWithSSORequest](#slash-api-v1-SignInWithSSORequest)
     - [SignOutRequest](#slash-api-v1-SignOutRequest)
-    - [SignOutResponse](#slash-api-v1-SignOutResponse)
     - [SignUpRequest](#slash-api-v1-SignUpRequest)
-    - [SignUpResponse](#slash-api-v1-SignUpResponse)
   
     - [AuthService](#slash-api-v1-AuthService)
   
 - [api/v1/collection_service.proto](#api_v1_collection_service-proto)
     - [Collection](#slash-api-v1-Collection)
     - [CreateCollectionRequest](#slash-api-v1-CreateCollectionRequest)
-    - [CreateCollectionResponse](#slash-api-v1-CreateCollectionResponse)
     - [DeleteCollectionRequest](#slash-api-v1-DeleteCollectionRequest)
-    - [DeleteCollectionResponse](#slash-api-v1-DeleteCollectionResponse)
     - [GetCollectionByNameRequest](#slash-api-v1-GetCollectionByNameRequest)
-    - [GetCollectionByNameResponse](#slash-api-v1-GetCollectionByNameResponse)
     - [GetCollectionRequest](#slash-api-v1-GetCollectionRequest)
-    - [GetCollectionResponse](#slash-api-v1-GetCollectionResponse)
     - [ListCollectionsRequest](#slash-api-v1-ListCollectionsRequest)
     - [ListCollectionsResponse](#slash-api-v1-ListCollectionsResponse)
     - [UpdateCollectionRequest](#slash-api-v1-UpdateCollectionRequest)
-    - [UpdateCollectionResponse](#slash-api-v1-UpdateCollectionResponse)
   
     - [CollectionService](#slash-api-v1-CollectionService)
   
 - [api/v1/shortcut_service.proto](#api_v1_shortcut_service-proto)
     - [CreateShortcutRequest](#slash-api-v1-CreateShortcutRequest)
-    - [CreateShortcutResponse](#slash-api-v1-CreateShortcutResponse)
     - [DeleteShortcutRequest](#slash-api-v1-DeleteShortcutRequest)
-    - [DeleteShortcutResponse](#slash-api-v1-DeleteShortcutResponse)
     - [GetShortcutAnalyticsRequest](#slash-api-v1-GetShortcutAnalyticsRequest)
     - [GetShortcutAnalyticsResponse](#slash-api-v1-GetShortcutAnalyticsResponse)
     - [GetShortcutAnalyticsResponse.AnalyticsItem](#slash-api-v1-GetShortcutAnalyticsResponse-AnalyticsItem)
     - [GetShortcutByNameRequest](#slash-api-v1-GetShortcutByNameRequest)
-    - [GetShortcutByNameResponse](#slash-api-v1-GetShortcutByNameResponse)
     - [GetShortcutRequest](#slash-api-v1-GetShortcutRequest)
-    - [GetShortcutResponse](#slash-api-v1-GetShortcutResponse)
     - [ListShortcutsRequest](#slash-api-v1-ListShortcutsRequest)
     - [ListShortcutsResponse](#slash-api-v1-ListShortcutsResponse)
-    - [OpenGraphMetadata](#slash-api-v1-OpenGraphMetadata)
     - [Shortcut](#slash-api-v1-Shortcut)
+    - [Shortcut.OpenGraphMetadata](#slash-api-v1-Shortcut-OpenGraphMetadata)
     - [UpdateShortcutRequest](#slash-api-v1-UpdateShortcutRequest)
-    - [UpdateShortcutResponse](#slash-api-v1-UpdateShortcutResponse)
   
     - [ShortcutService](#slash-api-v1-ShortcutService)
   
 - [api/v1/subscription_service.proto](#api_v1_subscription_service-proto)
+    - [DeleteSubscriptionRequest](#slash-api-v1-DeleteSubscriptionRequest)
     - [GetSubscriptionRequest](#slash-api-v1-GetSubscriptionRequest)
-    - [GetSubscriptionResponse](#slash-api-v1-GetSubscriptionResponse)
     - [Subscription](#slash-api-v1-Subscription)
     - [UpdateSubscriptionRequest](#slash-api-v1-UpdateSubscriptionRequest)
-    - [UpdateSubscriptionResponse](#slash-api-v1-UpdateSubscriptionResponse)
   
     - [PlanType](#slash-api-v1-PlanType)
   
@@ -94,26 +74,26 @@
   
 - [api/v1/user_setting_service.proto](#api_v1_user_setting_service-proto)
     - [GetUserSettingRequest](#slash-api-v1-GetUserSettingRequest)
-    - [GetUserSettingResponse](#slash-api-v1-GetUserSettingResponse)
     - [UpdateUserSettingRequest](#slash-api-v1-UpdateUserSettingRequest)
-    - [UpdateUserSettingResponse](#slash-api-v1-UpdateUserSettingResponse)
     - [UserSetting](#slash-api-v1-UserSetting)
-  
-    - [UserSetting.ColorTheme](#slash-api-v1-UserSetting-ColorTheme)
-    - [UserSetting.Locale](#slash-api-v1-UserSetting-Locale)
+    - [UserSetting.AccessTokensSetting](#slash-api-v1-UserSetting-AccessTokensSetting)
+    - [UserSetting.AccessTokensSetting.AccessToken](#slash-api-v1-UserSetting-AccessTokensSetting-AccessToken)
+    - [UserSetting.GeneralSetting](#slash-api-v1-UserSetting-GeneralSetting)
   
     - [UserSettingService](#slash-api-v1-UserSettingService)
   
 - [api/v1/workspace_service.proto](#api_v1_workspace_service-proto)
-    - [AutoBackupWorkspaceSetting](#slash-api-v1-AutoBackupWorkspaceSetting)
     - [GetWorkspaceProfileRequest](#slash-api-v1-GetWorkspaceProfileRequest)
-    - [GetWorkspaceProfileResponse](#slash-api-v1-GetWorkspaceProfileResponse)
     - [GetWorkspaceSettingRequest](#slash-api-v1-GetWorkspaceSettingRequest)
-    - [GetWorkspaceSettingResponse](#slash-api-v1-GetWorkspaceSettingResponse)
+    - [IdentityProvider](#slash-api-v1-IdentityProvider)
+    - [IdentityProviderConfig](#slash-api-v1-IdentityProviderConfig)
+    - [IdentityProviderConfig.FieldMapping](#slash-api-v1-IdentityProviderConfig-FieldMapping)
+    - [IdentityProviderConfig.OAuth2Config](#slash-api-v1-IdentityProviderConfig-OAuth2Config)
     - [UpdateWorkspaceSettingRequest](#slash-api-v1-UpdateWorkspaceSettingRequest)
-    - [UpdateWorkspaceSettingResponse](#slash-api-v1-UpdateWorkspaceSettingResponse)
     - [WorkspaceProfile](#slash-api-v1-WorkspaceProfile)
     - [WorkspaceSetting](#slash-api-v1-WorkspaceSetting)
+  
+    - [IdentityProvider.Type](#slash-api-v1-IdentityProvider-Type)
   
     - [WorkspaceService](#slash-api-v1-WorkspaceService)
   
@@ -130,16 +110,16 @@
  
 
 
-<a name="slash-api-v1-RowStatus"></a>
+<a name="slash-api-v1-State"></a>
 
-### RowStatus
+### State
 
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
-| ROW_STATUS_UNSPECIFIED | 0 |  |
-| NORMAL | 1 |  |
-| ARCHIVED | 2 |  |
+| STATE_UNSPECIFIED | 0 |  |
+| ACTIVE | 1 |  |
+| INACTIVE | 2 |  |
 
 
 
@@ -151,9 +131,8 @@
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | VISIBILITY_UNSPECIFIED | 0 |  |
-| PRIVATE | 1 |  |
-| WORKSPACE | 2 |  |
-| PUBLIC | 3 |  |
+| WORKSPACE | 1 |  |
+| PUBLIC | 2 |  |
 
 
  
@@ -188,39 +167,9 @@
 
 
 
-<a name="slash-api-v1-CreateUserAccessTokenResponse"></a>
-
-### CreateUserAccessTokenResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| access_token | [UserAccessToken](#slash-api-v1-UserAccessToken) |  |  |
-
-
-
-
-
-
 <a name="slash-api-v1-CreateUserRequest"></a>
 
 ### CreateUserRequest
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| user | [User](#slash-api-v1-User) |  |  |
-
-
-
-
-
-
-<a name="slash-api-v1-CreateUserResponse"></a>
-
-### CreateUserResponse
 
 
 
@@ -249,16 +198,6 @@
 
 
 
-<a name="slash-api-v1-DeleteUserAccessTokenResponse"></a>
-
-### DeleteUserAccessTokenResponse
-
-
-
-
-
-
-
 <a name="slash-api-v1-DeleteUserRequest"></a>
 
 ### DeleteUserRequest
@@ -274,16 +213,6 @@
 
 
 
-<a name="slash-api-v1-DeleteUserResponse"></a>
-
-### DeleteUserResponse
-
-
-
-
-
-
-
 <a name="slash-api-v1-GetUserRequest"></a>
 
 ### GetUserRequest
@@ -293,21 +222,6 @@
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | id | [int32](#int32) |  |  |
-
-
-
-
-
-
-<a name="slash-api-v1-GetUserResponse"></a>
-
-### GetUserResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| user | [User](#slash-api-v1-User) |  |  |
 
 
 
@@ -385,21 +299,6 @@
 
 
 
-<a name="slash-api-v1-UpdateUserResponse"></a>
-
-### UpdateUserResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| user | [User](#slash-api-v1-User) |  |  |
-
-
-
-
-
-
 <a name="slash-api-v1-User"></a>
 
 ### User
@@ -409,7 +308,7 @@
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | id | [int32](#int32) |  |  |
-| row_status | [RowStatus](#slash-api-v1-RowStatus) |  |  |
+| state | [State](#slash-api-v1-State) |  |  |
 | created_time | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  |  |
 | updated_time | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  |  |
 | role | [Role](#slash-api-v1-Role) |  |  |
@@ -467,13 +366,13 @@
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | ListUsers | [ListUsersRequest](#slash-api-v1-ListUsersRequest) | [ListUsersResponse](#slash-api-v1-ListUsersResponse) | ListUsers returns a list of users. |
-| GetUser | [GetUserRequest](#slash-api-v1-GetUserRequest) | [GetUserResponse](#slash-api-v1-GetUserResponse) | GetUser returns a user by id. |
-| CreateUser | [CreateUserRequest](#slash-api-v1-CreateUserRequest) | [CreateUserResponse](#slash-api-v1-CreateUserResponse) | CreateUser creates a new user. |
-| UpdateUser | [UpdateUserRequest](#slash-api-v1-UpdateUserRequest) | [UpdateUserResponse](#slash-api-v1-UpdateUserResponse) |  |
-| DeleteUser | [DeleteUserRequest](#slash-api-v1-DeleteUserRequest) | [DeleteUserResponse](#slash-api-v1-DeleteUserResponse) | DeleteUser deletes a user by id. |
+| GetUser | [GetUserRequest](#slash-api-v1-GetUserRequest) | [User](#slash-api-v1-User) | GetUser returns a user by id. |
+| CreateUser | [CreateUserRequest](#slash-api-v1-CreateUserRequest) | [User](#slash-api-v1-User) | CreateUser creates a new user. |
+| UpdateUser | [UpdateUserRequest](#slash-api-v1-UpdateUserRequest) | [User](#slash-api-v1-User) |  |
+| DeleteUser | [DeleteUserRequest](#slash-api-v1-DeleteUserRequest) | [.google.protobuf.Empty](#google-protobuf-Empty) | DeleteUser deletes a user by id. |
 | ListUserAccessTokens | [ListUserAccessTokensRequest](#slash-api-v1-ListUserAccessTokensRequest) | [ListUserAccessTokensResponse](#slash-api-v1-ListUserAccessTokensResponse) | ListUserAccessTokens returns a list of access tokens for a user. |
-| CreateUserAccessToken | [CreateUserAccessTokenRequest](#slash-api-v1-CreateUserAccessTokenRequest) | [CreateUserAccessTokenResponse](#slash-api-v1-CreateUserAccessTokenResponse) | CreateUserAccessToken creates a new access token for a user. |
-| DeleteUserAccessToken | [DeleteUserAccessTokenRequest](#slash-api-v1-DeleteUserAccessTokenRequest) | [DeleteUserAccessTokenResponse](#slash-api-v1-DeleteUserAccessTokenResponse) | DeleteUserAccessToken deletes an access token for a user. |
+| CreateUserAccessToken | [CreateUserAccessTokenRequest](#slash-api-v1-CreateUserAccessTokenRequest) | [UserAccessToken](#slash-api-v1-UserAccessToken) | CreateUserAccessToken creates a new access token for a user. |
+| DeleteUserAccessToken | [DeleteUserAccessTokenRequest](#slash-api-v1-DeleteUserAccessTokenRequest) | [.google.protobuf.Empty](#google-protobuf-Empty) | DeleteUserAccessToken deletes an access token for a user. |
 
  
 
@@ -496,21 +395,6 @@
 
 
 
-<a name="slash-api-v1-GetAuthStatusResponse"></a>
-
-### GetAuthStatusResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| user | [User](#slash-api-v1-User) |  |  |
-
-
-
-
-
-
 <a name="slash-api-v1-SignInRequest"></a>
 
 ### SignInRequest
@@ -527,15 +411,17 @@
 
 
 
-<a name="slash-api-v1-SignInResponse"></a>
+<a name="slash-api-v1-SignInWithSSORequest"></a>
 
-### SignInResponse
+### SignInWithSSORequest
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| user | [User](#slash-api-v1-User) |  |  |
+| idp_id | [string](#string) |  | The id of the SSO provider. |
+| code | [string](#string) |  | The code to sign in with. |
+| redirect_uri | [string](#string) |  | The redirect URI. |
 
 
 
@@ -545,16 +431,6 @@
 <a name="slash-api-v1-SignOutRequest"></a>
 
 ### SignOutRequest
-
-
-
-
-
-
-
-<a name="slash-api-v1-SignOutResponse"></a>
-
-### SignOutResponse
 
 
 
@@ -578,21 +454,6 @@
 
 
 
-
-<a name="slash-api-v1-SignUpResponse"></a>
-
-### SignUpResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| user | [User](#slash-api-v1-User) |  |  |
-
-
-
-
-
  
 
  
@@ -607,10 +468,11 @@
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| GetAuthStatus | [GetAuthStatusRequest](#slash-api-v1-GetAuthStatusRequest) | [GetAuthStatusResponse](#slash-api-v1-GetAuthStatusResponse) |  |
-| SignIn | [SignInRequest](#slash-api-v1-SignInRequest) | [SignInResponse](#slash-api-v1-SignInResponse) |  |
-| SignUp | [SignUpRequest](#slash-api-v1-SignUpRequest) | [SignUpResponse](#slash-api-v1-SignUpResponse) |  |
-| SignOut | [SignOutRequest](#slash-api-v1-SignOutRequest) | [SignOutResponse](#slash-api-v1-SignOutResponse) |  |
+| GetAuthStatus | [GetAuthStatusRequest](#slash-api-v1-GetAuthStatusRequest) | [User](#slash-api-v1-User) | GetAuthStatus returns the current auth status of the user. |
+| SignIn | [SignInRequest](#slash-api-v1-SignInRequest) | [User](#slash-api-v1-User) | SignIn signs in the user with the given username and password. |
+| SignInWithSSO | [SignInWithSSORequest](#slash-api-v1-SignInWithSSORequest) | [User](#slash-api-v1-User) | SignInWithSSO signs in the user with the given SSO code. |
+| SignUp | [SignUpRequest](#slash-api-v1-SignUpRequest) | [User](#slash-api-v1-User) | SignUp signs up the user with the given username and password. |
+| SignOut | [SignOutRequest](#slash-api-v1-SignOutRequest) | [.google.protobuf.Empty](#google-protobuf-Empty) | SignOut signs out the user. |
 
  
 
@@ -661,21 +523,6 @@
 
 
 
-<a name="slash-api-v1-CreateCollectionResponse"></a>
-
-### CreateCollectionResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| collection | [Collection](#slash-api-v1-Collection) |  |  |
-
-
-
-
-
-
 <a name="slash-api-v1-DeleteCollectionRequest"></a>
 
 ### DeleteCollectionRequest
@@ -685,16 +532,6 @@
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | id | [int32](#int32) |  |  |
-
-
-
-
-
-
-<a name="slash-api-v1-DeleteCollectionResponse"></a>
-
-### DeleteCollectionResponse
-
 
 
 
@@ -716,21 +553,6 @@
 
 
 
-<a name="slash-api-v1-GetCollectionByNameResponse"></a>
-
-### GetCollectionByNameResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| collection | [Collection](#slash-api-v1-Collection) |  |  |
-
-
-
-
-
-
 <a name="slash-api-v1-GetCollectionRequest"></a>
 
 ### GetCollectionRequest
@@ -740,21 +562,6 @@
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | id | [int32](#int32) |  |  |
-
-
-
-
-
-
-<a name="slash-api-v1-GetCollectionResponse"></a>
-
-### GetCollectionResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| collection | [Collection](#slash-api-v1-Collection) |  |  |
 
 
 
@@ -801,21 +608,6 @@
 
 
 
-
-<a name="slash-api-v1-UpdateCollectionResponse"></a>
-
-### UpdateCollectionResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| collection | [Collection](#slash-api-v1-Collection) |  |  |
-
-
-
-
-
  
 
  
@@ -831,11 +623,11 @@
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | ListCollections | [ListCollectionsRequest](#slash-api-v1-ListCollectionsRequest) | [ListCollectionsResponse](#slash-api-v1-ListCollectionsResponse) | ListCollections returns a list of collections. |
-| GetCollection | [GetCollectionRequest](#slash-api-v1-GetCollectionRequest) | [GetCollectionResponse](#slash-api-v1-GetCollectionResponse) | GetCollection returns a collection by id. |
-| GetCollectionByName | [GetCollectionByNameRequest](#slash-api-v1-GetCollectionByNameRequest) | [GetCollectionByNameResponse](#slash-api-v1-GetCollectionByNameResponse) | GetCollectionByName returns a collection by name. |
-| CreateCollection | [CreateCollectionRequest](#slash-api-v1-CreateCollectionRequest) | [CreateCollectionResponse](#slash-api-v1-CreateCollectionResponse) | CreateCollection creates a collection. |
-| UpdateCollection | [UpdateCollectionRequest](#slash-api-v1-UpdateCollectionRequest) | [UpdateCollectionResponse](#slash-api-v1-UpdateCollectionResponse) | UpdateCollection updates a collection. |
-| DeleteCollection | [DeleteCollectionRequest](#slash-api-v1-DeleteCollectionRequest) | [DeleteCollectionResponse](#slash-api-v1-DeleteCollectionResponse) | DeleteCollection deletes a collection by id. |
+| GetCollection | [GetCollectionRequest](#slash-api-v1-GetCollectionRequest) | [Collection](#slash-api-v1-Collection) | GetCollection returns a collection by id. |
+| GetCollectionByName | [GetCollectionByNameRequest](#slash-api-v1-GetCollectionByNameRequest) | [Collection](#slash-api-v1-Collection) | GetCollectionByName returns a collection by name. |
+| CreateCollection | [CreateCollectionRequest](#slash-api-v1-CreateCollectionRequest) | [Collection](#slash-api-v1-Collection) | CreateCollection creates a collection. |
+| UpdateCollection | [UpdateCollectionRequest](#slash-api-v1-UpdateCollectionRequest) | [Collection](#slash-api-v1-Collection) | UpdateCollection updates a collection. |
+| DeleteCollection | [DeleteCollectionRequest](#slash-api-v1-DeleteCollectionRequest) | [.google.protobuf.Empty](#google-protobuf-Empty) | DeleteCollection deletes a collection by id. |
 
  
 
@@ -863,21 +655,6 @@
 
 
 
-<a name="slash-api-v1-CreateShortcutResponse"></a>
-
-### CreateShortcutResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| shortcut | [Shortcut](#slash-api-v1-Shortcut) |  |  |
-
-
-
-
-
-
 <a name="slash-api-v1-DeleteShortcutRequest"></a>
 
 ### DeleteShortcutRequest
@@ -887,16 +664,6 @@
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | id | [int32](#int32) |  |  |
-
-
-
-
-
-
-<a name="slash-api-v1-DeleteShortcutResponse"></a>
-
-### DeleteShortcutResponse
-
 
 
 
@@ -966,21 +733,6 @@
 
 
 
-<a name="slash-api-v1-GetShortcutByNameResponse"></a>
-
-### GetShortcutByNameResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| shortcut | [Shortcut](#slash-api-v1-Shortcut) |  |  |
-
-
-
-
-
-
 <a name="slash-api-v1-GetShortcutRequest"></a>
 
 ### GetShortcutRequest
@@ -990,21 +742,6 @@
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | id | [int32](#int32) |  |  |
-
-
-
-
-
-
-<a name="slash-api-v1-GetShortcutResponse"></a>
-
-### GetShortcutResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| shortcut | [Shortcut](#slash-api-v1-Shortcut) |  |  |
 
 
 
@@ -1036,23 +773,6 @@
 
 
 
-<a name="slash-api-v1-OpenGraphMetadata"></a>
-
-### OpenGraphMetadata
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| title | [string](#string) |  |  |
-| description | [string](#string) |  |  |
-| image | [string](#string) |  |  |
-
-
-
-
-
-
 <a name="slash-api-v1-Shortcut"></a>
 
 ### Shortcut
@@ -1065,7 +785,6 @@
 | creator_id | [int32](#int32) |  |  |
 | created_time | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  |  |
 | updated_time | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  |  |
-| row_status | [RowStatus](#slash-api-v1-RowStatus) |  |  |
 | name | [string](#string) |  |  |
 | link | [string](#string) |  |  |
 | title | [string](#string) |  |  |
@@ -1073,7 +792,24 @@
 | description | [string](#string) |  |  |
 | visibility | [Visibility](#slash-api-v1-Visibility) |  |  |
 | view_count | [int32](#int32) |  |  |
-| og_metadata | [OpenGraphMetadata](#slash-api-v1-OpenGraphMetadata) |  |  |
+| og_metadata | [Shortcut.OpenGraphMetadata](#slash-api-v1-Shortcut-OpenGraphMetadata) |  |  |
+
+
+
+
+
+
+<a name="slash-api-v1-Shortcut-OpenGraphMetadata"></a>
+
+### Shortcut.OpenGraphMetadata
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| title | [string](#string) |  |  |
+| description | [string](#string) |  |  |
+| image | [string](#string) |  |  |
 
 
 
@@ -1095,21 +831,6 @@
 
 
 
-
-<a name="slash-api-v1-UpdateShortcutResponse"></a>
-
-### UpdateShortcutResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| shortcut | [Shortcut](#slash-api-v1-Shortcut) |  |  |
-
-
-
-
-
  
 
  
@@ -1125,11 +846,11 @@
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | ListShortcuts | [ListShortcutsRequest](#slash-api-v1-ListShortcutsRequest) | [ListShortcutsResponse](#slash-api-v1-ListShortcutsResponse) | ListShortcuts returns a list of shortcuts. |
-| GetShortcut | [GetShortcutRequest](#slash-api-v1-GetShortcutRequest) | [GetShortcutResponse](#slash-api-v1-GetShortcutResponse) | GetShortcut returns a shortcut by id. |
-| GetShortcutByName | [GetShortcutByNameRequest](#slash-api-v1-GetShortcutByNameRequest) | [GetShortcutByNameResponse](#slash-api-v1-GetShortcutByNameResponse) | GetShortcutByName returns a shortcut by name. |
-| CreateShortcut | [CreateShortcutRequest](#slash-api-v1-CreateShortcutRequest) | [CreateShortcutResponse](#slash-api-v1-CreateShortcutResponse) | CreateShortcut creates a shortcut. |
-| UpdateShortcut | [UpdateShortcutRequest](#slash-api-v1-UpdateShortcutRequest) | [UpdateShortcutResponse](#slash-api-v1-UpdateShortcutResponse) | UpdateShortcut updates a shortcut. |
-| DeleteShortcut | [DeleteShortcutRequest](#slash-api-v1-DeleteShortcutRequest) | [DeleteShortcutResponse](#slash-api-v1-DeleteShortcutResponse) | DeleteShortcut deletes a shortcut by name. |
+| GetShortcut | [GetShortcutRequest](#slash-api-v1-GetShortcutRequest) | [Shortcut](#slash-api-v1-Shortcut) | GetShortcut returns a shortcut by id. |
+| GetShortcutByName | [GetShortcutByNameRequest](#slash-api-v1-GetShortcutByNameRequest) | [Shortcut](#slash-api-v1-Shortcut) | GetShortcutByName returns a shortcut by name. |
+| CreateShortcut | [CreateShortcutRequest](#slash-api-v1-CreateShortcutRequest) | [Shortcut](#slash-api-v1-Shortcut) | CreateShortcut creates a shortcut. |
+| UpdateShortcut | [UpdateShortcutRequest](#slash-api-v1-UpdateShortcutRequest) | [Shortcut](#slash-api-v1-Shortcut) | UpdateShortcut updates a shortcut. |
+| DeleteShortcut | [DeleteShortcutRequest](#slash-api-v1-DeleteShortcutRequest) | [.google.protobuf.Empty](#google-protobuf-Empty) | DeleteShortcut deletes a shortcut by name. |
 | GetShortcutAnalytics | [GetShortcutAnalyticsRequest](#slash-api-v1-GetShortcutAnalyticsRequest) | [GetShortcutAnalyticsResponse](#slash-api-v1-GetShortcutAnalyticsResponse) | GetShortcutAnalytics returns the analytics for a shortcut. |
 
  
@@ -1143,25 +864,20 @@
 
 
 
+<a name="slash-api-v1-DeleteSubscriptionRequest"></a>
+
+### DeleteSubscriptionRequest
+
+
+
+
+
+
+
 <a name="slash-api-v1-GetSubscriptionRequest"></a>
 
 ### GetSubscriptionRequest
 
-
-
-
-
-
-
-<a name="slash-api-v1-GetSubscriptionResponse"></a>
-
-### GetSubscriptionResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| subscription | [Subscription](#slash-api-v1-Subscription) |  |  |
 
 
 
@@ -1179,6 +895,10 @@
 | plan | [PlanType](#slash-api-v1-PlanType) |  |  |
 | started_time | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  |  |
 | expires_time | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  |  |
+| features | [string](#string) | repeated |  |
+| seats | [int32](#int32) |  |  |
+| shortcuts_limit | [int32](#int32) |  |  |
+| collections_limit | [int32](#int32) |  |  |
 
 
 
@@ -1199,21 +919,6 @@
 
 
 
-
-<a name="slash-api-v1-UpdateSubscriptionResponse"></a>
-
-### UpdateSubscriptionResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| subscription | [Subscription](#slash-api-v1-Subscription) |  |  |
-
-
-
-
-
  
 
 
@@ -1227,6 +932,7 @@
 | PLAN_TYPE_UNSPECIFIED | 0 |  |
 | FREE | 1 |  |
 | PRO | 2 |  |
+| ENTERPRISE | 3 |  |
 
 
  
@@ -1241,8 +947,9 @@
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| GetSubscription | [GetSubscriptionRequest](#slash-api-v1-GetSubscriptionRequest) | [GetSubscriptionResponse](#slash-api-v1-GetSubscriptionResponse) |  |
-| UpdateSubscription | [UpdateSubscriptionRequest](#slash-api-v1-UpdateSubscriptionRequest) | [UpdateSubscriptionResponse](#slash-api-v1-UpdateSubscriptionResponse) |  |
+| GetSubscription | [GetSubscriptionRequest](#slash-api-v1-GetSubscriptionRequest) | [Subscription](#slash-api-v1-Subscription) | GetSubscription gets the current subscription of Slash instance. |
+| UpdateSubscription | [UpdateSubscriptionRequest](#slash-api-v1-UpdateSubscriptionRequest) | [Subscription](#slash-api-v1-Subscription) | UpdateSubscription updates the subscription. |
+| DeleteSubscription | [DeleteSubscriptionRequest](#slash-api-v1-DeleteSubscriptionRequest) | [Subscription](#slash-api-v1-Subscription) | DeleteSubscription deletes the subscription. |
 
  
 
@@ -1270,21 +977,6 @@
 
 
 
-<a name="slash-api-v1-GetUserSettingResponse"></a>
-
-### GetUserSettingResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| user_setting | [UserSetting](#slash-api-v1-UserSetting) |  |  |
-
-
-
-
-
-
 <a name="slash-api-v1-UpdateUserSettingRequest"></a>
 
 ### UpdateUserSettingRequest
@@ -1302,21 +994,6 @@
 
 
 
-<a name="slash-api-v1-UpdateUserSettingResponse"></a>
-
-### UpdateUserSettingResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| user_setting | [UserSetting](#slash-api-v1-UserSetting) |  |  |
-
-
-
-
-
-
 <a name="slash-api-v1-UserSetting"></a>
 
 ### UserSetting
@@ -1325,43 +1002,62 @@
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| id | [int32](#int32) |  | id is the user id. |
-| locale | [UserSetting.Locale](#slash-api-v1-UserSetting-Locale) |  | locale is the user locale. |
-| color_theme | [UserSetting.ColorTheme](#slash-api-v1-UserSetting-ColorTheme) |  | color_theme is the user color theme. |
+| user_id | [int32](#int32) |  |  |
+| general | [UserSetting.GeneralSetting](#slash-api-v1-UserSetting-GeneralSetting) |  |  |
+| access_tokens | [UserSetting.AccessTokensSetting](#slash-api-v1-UserSetting-AccessTokensSetting) |  |  |
+
+
+
+
+
+
+<a name="slash-api-v1-UserSetting-AccessTokensSetting"></a>
+
+### UserSetting.AccessTokensSetting
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| access_tokens | [UserSetting.AccessTokensSetting.AccessToken](#slash-api-v1-UserSetting-AccessTokensSetting-AccessToken) | repeated | Nested repeated field |
+
+
+
+
+
+
+<a name="slash-api-v1-UserSetting-AccessTokensSetting-AccessToken"></a>
+
+### UserSetting.AccessTokensSetting.AccessToken
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| access_token | [string](#string) |  | The access token is a JWT token, including expiration time, issuer, etc. |
+| description | [string](#string) |  | A description for the access token. |
+
+
+
+
+
+
+<a name="slash-api-v1-UserSetting-GeneralSetting"></a>
+
+### UserSetting.GeneralSetting
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| locale | [string](#string) |  |  |
+| color_theme | [string](#string) |  |  |
 
 
 
 
 
  
-
-
-<a name="slash-api-v1-UserSetting-ColorTheme"></a>
-
-### UserSetting.ColorTheme
-
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| COLOR_THEME_UNSPECIFIED | 0 |  |
-| COLOR_THEME_SYSTEM | 1 |  |
-| COLOR_THEME_LIGHT | 2 |  |
-| COLOR_THEME_DARK | 3 |  |
-
-
-
-<a name="slash-api-v1-UserSetting-Locale"></a>
-
-### UserSetting.Locale
-
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| LOCALE_UNSPECIFIED | 0 |  |
-| LOCALE_EN | 1 |  |
-| LOCALE_ZH | 2 |  |
-| LOCALE_FR | 3 |  |
-
 
  
 
@@ -1375,8 +1071,8 @@
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| GetUserSetting | [GetUserSettingRequest](#slash-api-v1-GetUserSettingRequest) | [GetUserSettingResponse](#slash-api-v1-GetUserSettingResponse) | GetUserSetting returns the user setting. |
-| UpdateUserSetting | [UpdateUserSettingRequest](#slash-api-v1-UpdateUserSettingRequest) | [UpdateUserSettingResponse](#slash-api-v1-UpdateUserSettingResponse) | UpdateUserSetting updates the user setting. |
+| GetUserSetting | [GetUserSettingRequest](#slash-api-v1-GetUserSettingRequest) | [UserSetting](#slash-api-v1-UserSetting) | GetUserSetting returns the user setting. |
+| UpdateUserSetting | [UpdateUserSettingRequest](#slash-api-v1-UpdateUserSettingRequest) | [UserSetting](#slash-api-v1-UserSetting) | UpdateUserSetting updates the user setting. |
 
  
 
@@ -1389,42 +1085,10 @@
 
 
 
-<a name="slash-api-v1-AutoBackupWorkspaceSetting"></a>
-
-### AutoBackupWorkspaceSetting
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| enabled | [bool](#bool) |  | Whether auto backup is enabled. |
-| cron_expression | [string](#string) |  | The cron expression for auto backup. For example, &#34;0 0 0 * * *&#34; means backup at 00:00:00 every day. See https://en.wikipedia.org/wiki/Cron for more details. |
-| max_keep | [int32](#int32) |  | The maximum number of backups to keep. |
-
-
-
-
-
-
 <a name="slash-api-v1-GetWorkspaceProfileRequest"></a>
 
 ### GetWorkspaceProfileRequest
 
-
-
-
-
-
-
-<a name="slash-api-v1-GetWorkspaceProfileResponse"></a>
-
-### GetWorkspaceProfileResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| profile | [WorkspaceProfile](#slash-api-v1-WorkspaceProfile) |  | The workspace profile. |
 
 
 
@@ -1441,15 +1105,70 @@
 
 
 
-<a name="slash-api-v1-GetWorkspaceSettingResponse"></a>
+<a name="slash-api-v1-IdentityProvider"></a>
 
-### GetWorkspaceSettingResponse
+### IdentityProvider
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| setting | [WorkspaceSetting](#slash-api-v1-WorkspaceSetting) |  | The user setting. |
+| id | [string](#string) |  | The unique identifier of the identity provider. |
+| title | [string](#string) |  |  |
+| type | [IdentityProvider.Type](#slash-api-v1-IdentityProvider-Type) |  |  |
+| config | [IdentityProviderConfig](#slash-api-v1-IdentityProviderConfig) |  |  |
+
+
+
+
+
+
+<a name="slash-api-v1-IdentityProviderConfig"></a>
+
+### IdentityProviderConfig
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| oauth2 | [IdentityProviderConfig.OAuth2Config](#slash-api-v1-IdentityProviderConfig-OAuth2Config) |  |  |
+
+
+
+
+
+
+<a name="slash-api-v1-IdentityProviderConfig-FieldMapping"></a>
+
+### IdentityProviderConfig.FieldMapping
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| identifier | [string](#string) |  |  |
+| display_name | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="slash-api-v1-IdentityProviderConfig-OAuth2Config"></a>
+
+### IdentityProviderConfig.OAuth2Config
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| client_id | [string](#string) |  |  |
+| client_secret | [string](#string) |  |  |
+| auth_url | [string](#string) |  |  |
+| token_url | [string](#string) |  |  |
+| user_info_url | [string](#string) |  |  |
+| scopes | [string](#string) | repeated |  |
+| field_mapping | [IdentityProviderConfig.FieldMapping](#slash-api-v1-IdentityProviderConfig-FieldMapping) |  |  |
 
 
 
@@ -1472,21 +1191,6 @@
 
 
 
-<a name="slash-api-v1-UpdateWorkspaceSettingResponse"></a>
-
-### UpdateWorkspaceSettingResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| setting | [WorkspaceSetting](#slash-api-v1-WorkspaceSetting) |  | The user setting. |
-
-
-
-
-
-
 <a name="slash-api-v1-WorkspaceProfile"></a>
 
 ### WorkspaceProfile
@@ -1497,12 +1201,9 @@
 | ----- | ---- | ----- | ----------- |
 | mode | [string](#string) |  | Current workspace mode: dev, prod. |
 | version | [string](#string) |  | Current workspace version. |
-| plan | [PlanType](#slash-api-v1-PlanType) |  | The workspace plan. |
-| enable_signup | [bool](#bool) |  | Whether to enable other users to sign up. |
-| custom_style | [string](#string) |  | The custom style. |
-| custom_script | [string](#string) |  | The custom script. |
-| favicon_provider | [string](#string) |  | The url of custom favicon provider. |
 | owner | [string](#string) |  | The owner name. Format: &#34;users/{id}&#34; |
+| subscription | [Subscription](#slash-api-v1-Subscription) |  | The workspace subscription. |
+| branding | [bytes](#bytes) |  | The workspace branding. |
 
 
 
@@ -1517,20 +1218,30 @@
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| license_key | [string](#string) |  |  |
-| enable_signup | [bool](#bool) |  | Whether to enable other users to sign up. |
-| instance_url | [string](#string) |  | The instance URL. |
-| custom_style | [string](#string) |  | The custom style. |
-| custom_script | [string](#string) |  | The custom script. |
-| auto_backup | [AutoBackupWorkspaceSetting](#slash-api-v1-AutoBackupWorkspaceSetting) |  | The auto backup setting. (Unimplemented) |
+| instance_url | [string](#string) |  | The url of instance. |
+| branding | [bytes](#bytes) |  | The workspace custome branding. |
 | default_visibility | [Visibility](#slash-api-v1-Visibility) |  | The default visibility of shortcuts and collections. |
-| favicon_provider | [string](#string) |  | The url of custom favicon provider. |
+| identity_providers | [IdentityProvider](#slash-api-v1-IdentityProvider) | repeated | The identity providers. |
+| disallow_user_registration | [bool](#bool) |  | Whether to disallow user registration by email&amp;password. |
+| disallow_password_auth | [bool](#bool) |  | Whether to disallow password authentication. |
 
 
 
 
 
  
+
+
+<a name="slash-api-v1-IdentityProvider-Type"></a>
+
+### IdentityProvider.Type
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| TYPE_UNSPECIFIED | 0 |  |
+| OAUTH2 | 1 |  |
+
 
  
 
@@ -1544,9 +1255,9 @@
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| GetWorkspaceProfile | [GetWorkspaceProfileRequest](#slash-api-v1-GetWorkspaceProfileRequest) | [GetWorkspaceProfileResponse](#slash-api-v1-GetWorkspaceProfileResponse) |  |
-| GetWorkspaceSetting | [GetWorkspaceSettingRequest](#slash-api-v1-GetWorkspaceSettingRequest) | [GetWorkspaceSettingResponse](#slash-api-v1-GetWorkspaceSettingResponse) |  |
-| UpdateWorkspaceSetting | [UpdateWorkspaceSettingRequest](#slash-api-v1-UpdateWorkspaceSettingRequest) | [UpdateWorkspaceSettingResponse](#slash-api-v1-UpdateWorkspaceSettingResponse) |  |
+| GetWorkspaceProfile | [GetWorkspaceProfileRequest](#slash-api-v1-GetWorkspaceProfileRequest) | [WorkspaceProfile](#slash-api-v1-WorkspaceProfile) |  |
+| GetWorkspaceSetting | [GetWorkspaceSettingRequest](#slash-api-v1-GetWorkspaceSettingRequest) | [WorkspaceSetting](#slash-api-v1-WorkspaceSetting) |  |
+| UpdateWorkspaceSetting | [UpdateWorkspaceSettingRequest](#slash-api-v1-UpdateWorkspaceSettingRequest) | [WorkspaceSetting](#slash-api-v1-WorkspaceSetting) |  |
 
  
 

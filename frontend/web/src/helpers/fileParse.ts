@@ -1,30 +1,30 @@
-import * as cheerio from 'cheerio';
+import * as cheerio from "cheerio";
 
+export const parseBookmarks = (htmlContent: string) => {
+  const $ = cheerio.load(htmlContent);
+  const bookmarks: { title: string; url: string; tags: string[] }[] = [];
 
-export const parseBookmarks =(htmlContent: string) => {
-    const $ = cheerio.load(htmlContent);
-    const bookmarks: { title: string, url: string, tags: string[] }[] = [];
+  $("DT > A").each((index, element) => {
+    const title = $(element).text();
+    const url = $(element).attr("href") || "";
+    const tags: string[] = [];
 
-    $('DT > A').each((index, element) => {
-        const title = $(element).text();
-        const url = $(element).attr('href') || '';
-        const tags: string[] = [];
+    $(element)
+      .parents("DL")
+      .prev("H3")
+      .each((i, el) => {
+        tags.push($(el).text());
+      });
 
-        $(element).parents('DL').prev('H3').each((i, el) => {
-            tags.push($(el).text());
-        });
-
-        bookmarks.push({
-            title,
-            url,
-            tags: tags.reverse() // 反转数组以确保标签顺序正确
-        });
+    bookmarks.push({
+      title,
+      url,
+      tags: tags.reverse(), // 反转数组以确保标签顺序正确
     });
+  });
 
-    return bookmarks;
-}
-
-
+  return bookmarks;
+};
 
 export const generateRandomName = () => {
   const chars = "abcdefghijklmnopqrstuvwxyz0123456789";

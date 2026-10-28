@@ -1,6 +1,8 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "@/App";
 import Root from "@/layouts/Root";
+import AdminSignIn from "@/pages/AdminSignIn";
+import AuthCallback from "@/pages/AuthCallback";
 import CollectionDashboard from "@/pages/CollectionDashboard";
 import CollectionSpace from "@/pages/CollectionSpace";
 import Home from "@/pages/Home";
@@ -21,11 +23,24 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/auth",
-        element: <SignIn />,
-      },
-      {
-        path: "/auth/signup",
-        element: <SignUp />,
+        children: [
+          {
+            path: "",
+            element: <SignIn />,
+          },
+          {
+            path: "admin",
+            element: <AdminSignIn />,
+          },
+          {
+            path: "signup",
+            element: <SignUp />,
+          },
+          {
+            path: "callback",
+            element: <AuthCallback />,
+          },
+        ],
       },
       {
         path: "",

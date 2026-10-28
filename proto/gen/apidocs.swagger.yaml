@@ -17,12 +17,13 @@ produces:
 paths:
   /api/v1/auth/signin:
     post:
+      summary: SignIn signs in the user with the given username and password.
       operationId: AuthService_SignIn
       responses:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1SignInResponse'
+            $ref: '#/definitions/v1User'
         default:
           description: An unexpected error response.
           schema:
@@ -38,14 +39,47 @@ paths:
           type: string
       tags:
         - AuthService
+  /api/v1/auth/signin/sso:
+    post:
+      summary: SignInWithSSO signs in the user with the given SSO code.
+      operationId: AuthService_SignInWithSSO
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1User'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: idpId
+          description: The id of the SSO provider.
+          in: query
+          required: false
+          type: string
+        - name: code
+          description: The code to sign in with.
+          in: query
+          required: false
+          type: string
+        - name: redirectUri
+          description: The redirect URI.
+          in: query
+          required: false
+          type: string
+      tags:
+        - AuthService
   /api/v1/auth/signout:
     post:
+      summary: SignOut signs out the user.
       operationId: AuthService_SignOut
       responses:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1SignOutResponse'
+            type: object
+            properties: {}
         default:
           description: An unexpected error response.
           schema:
@@ -54,12 +88,13 @@ paths:
         - AuthService
   /api/v1/auth/signup:
     post:
+      summary: SignUp signs up the user with the given username and password.
       operationId: AuthService_SignUp
       responses:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1SignUpResponse'
+            $ref: '#/definitions/v1User'
         default:
           description: An unexpected error response.
           schema:
@@ -81,12 +116,13 @@ paths:
         - AuthService
   /api/v1/auth/status:
     post:
+      summary: GetAuthStatus returns the current auth status of the user.
       operationId: AuthService_GetAuthStatus
       responses:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1GetAuthStatusResponse'
+            $ref: '#/definitions/v1User'
         default:
           description: An unexpected error response.
           schema:
@@ -115,7 +151,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1CreateCollectionResponse'
+            $ref: '#/definitions/apiv1Collection'
         default:
           description: An unexpected error response.
           schema:
@@ -136,7 +172,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1UpdateCollectionResponse'
+            $ref: '#/definitions/apiv1Collection'
         default:
           description: An unexpected error response.
           schema:
@@ -189,7 +225,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1GetCollectionResponse'
+            $ref: '#/definitions/apiv1Collection'
         default:
           description: An unexpected error response.
           schema:
@@ -209,7 +245,8 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1DeleteCollectionResponse'
+            type: object
+            properties: {}
         default:
           description: An unexpected error response.
           schema:
@@ -244,7 +281,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1CreateShortcutResponse'
+            $ref: '#/definitions/apiv1Shortcut'
         default:
           description: An unexpected error response.
           schema:
@@ -265,7 +302,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1GetShortcutResponse'
+            $ref: '#/definitions/apiv1Shortcut'
         default:
           description: An unexpected error response.
           schema:
@@ -285,7 +322,8 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1DeleteShortcutResponse'
+            type: object
+            properties: {}
         default:
           description: An unexpected error response.
           schema:
@@ -327,7 +365,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1UpdateShortcutResponse'
+            $ref: '#/definitions/apiv1Shortcut'
         default:
           description: An unexpected error response.
           schema:
@@ -353,8 +391,6 @@ paths:
               updatedTime:
                 type: string
                 format: date-time
-              rowStatus:
-                $ref: '#/definitions/apiv1RowStatus'
               name:
                 type: string
               link:
@@ -373,7 +409,7 @@ paths:
                 type: integer
                 format: int32
               ogMetadata:
-                $ref: '#/definitions/apiv1OpenGraphMetadata'
+                $ref: '#/definitions/v1ShortcutOpenGraphMetadata'
         - name: updateMask
           in: query
           required: false
@@ -402,7 +438,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1CreateUserResponse'
+            $ref: '#/definitions/v1User'
         default:
           description: An unexpected error response.
           schema:
@@ -423,7 +459,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1GetUserResponse'
+            $ref: '#/definitions/v1User'
         default:
           description: An unexpected error response.
           schema:
@@ -443,7 +479,8 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1DeleteUserResponse'
+            type: object
+            properties: {}
         default:
           description: An unexpected error response.
           schema:
@@ -485,7 +522,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1CreateUserAccessTokenResponse'
+            $ref: '#/definitions/v1UserAccessToken'
         default:
           description: An unexpected error response.
           schema:
@@ -512,7 +549,8 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1DeleteUserAccessTokenResponse'
+            type: object
+            properties: {}
         default:
           description: An unexpected error response.
           schema:
@@ -539,7 +577,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1GetUserSettingResponse'
+            $ref: '#/definitions/apiv1UserSetting'
         default:
           description: An unexpected error response.
           schema:
@@ -560,7 +598,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1UpdateUserSettingResponse'
+            $ref: '#/definitions/apiv1UserSetting'
         default:
           description: An unexpected error response.
           schema:
@@ -587,7 +625,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1UpdateUserResponse'
+            $ref: '#/definitions/v1User'
         default:
           description: An unexpected error response.
           schema:
@@ -604,8 +642,8 @@ paths:
           schema:
             type: object
             properties:
-              rowStatus:
-                $ref: '#/definitions/apiv1RowStatus'
+              state:
+                $ref: '#/definitions/v1State'
               createdTime:
                 type: string
                 format: date-time
@@ -629,7 +667,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1GetWorkspaceProfileResponse'
+            $ref: '#/definitions/v1WorkspaceProfile'
         default:
           description: An unexpected error response.
           schema:
@@ -643,7 +681,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1GetWorkspaceSettingResponse'
+            $ref: '#/definitions/apiv1WorkspaceSetting'
         default:
           description: An unexpected error response.
           schema:
@@ -656,7 +694,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1UpdateWorkspaceSettingResponse'
+            $ref: '#/definitions/apiv1WorkspaceSetting'
         default:
           description: An unexpected error response.
           schema:
@@ -672,12 +710,27 @@ paths:
         - WorkspaceService
   /v1/subscription:
     get:
+      summary: GetSubscription gets the current subscription of Slash instance.
       operationId: SubscriptionService_GetSubscription
       responses:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1GetSubscriptionResponse'
+            $ref: '#/definitions/v1Subscription'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      tags:
+        - SubscriptionService
+    delete:
+      summary: DeleteSubscription deletes the subscription.
+      operationId: SubscriptionService_DeleteSubscription
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1Subscription'
         default:
           description: An unexpected error response.
           schema:
@@ -685,12 +738,13 @@ paths:
       tags:
         - SubscriptionService
     patch:
+      summary: UpdateSubscription updates the subscription.
       operationId: SubscriptionService_UpdateSubscription
       responses:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1UpdateSubscriptionResponse'
+            $ref: '#/definitions/v1Subscription'
         default:
           description: An unexpected error response.
           schema:
@@ -724,38 +778,6 @@ definitions:
         description: |-
           expires_at is the expiration time of the access token.
           If expires_at is not set, the access token will never expire.
-  UserSettingColorTheme:
-    type: string
-    enum:
-      - COLOR_THEME_UNSPECIFIED
-      - COLOR_THEME_SYSTEM
-      - COLOR_THEME_LIGHT
-      - COLOR_THEME_DARK
-    default: COLOR_THEME_UNSPECIFIED
-  UserSettingLocale:
-    type: string
-    enum:
-      - LOCALE_UNSPECIFIED
-      - LOCALE_EN
-      - LOCALE_ZH
-      - LOCALE_FR
-    default: LOCALE_UNSPECIFIED
-  apiv1AutoBackupWorkspaceSetting:
-    type: object
-    properties:
-      enabled:
-        type: boolean
-        description: Whether auto backup is enabled.
-      cronExpression:
-        type: string
-        description: |-
-          The cron expression for auto backup.
-          For example, "0 0 0 * * *" means backup at 00:00:00 every day.
-          See https://en.wikipedia.org/wiki/Cron for more details.
-      maxKeep:
-        type: integer
-        format: int32
-        description: The maximum number of backups to keep.
   apiv1Collection:
     type: object
     properties:
@@ -784,22 +806,55 @@ definitions:
           format: int32
       visibility:
         $ref: '#/definitions/apiv1Visibility'
-  apiv1OpenGraphMetadata:
+  apiv1IdentityProvider:
     type: object
     properties:
+      id:
+        type: string
+        description: The unique identifier of the identity provider.
       title:
         type: string
-      description:
+      type:
+        $ref: '#/definitions/apiv1IdentityProviderType'
+      config:
+        $ref: '#/definitions/apiv1IdentityProviderConfig'
+  apiv1IdentityProviderConfig:
+    type: object
+    properties:
+      oauth2:
+        $ref: '#/definitions/apiv1IdentityProviderConfigOAuth2Config'
+  apiv1IdentityProviderConfigFieldMapping:
+    type: object
+    properties:
+      identifier:
         type: string
-      image:
+      displayName:
         type: string
-  apiv1RowStatus:
+  apiv1IdentityProviderConfigOAuth2Config:
+    type: object
+    properties:
+      clientId:
+        type: string
+      clientSecret:
+        type: string
+      authUrl:
+        type: string
+      tokenUrl:
+        type: string
+      userInfoUrl:
+        type: string
+      scopes:
+        type: array
+        items:
+          type: string
+      fieldMapping:
+        $ref: '#/definitions/apiv1IdentityProviderConfigFieldMapping'
+  apiv1IdentityProviderType:
     type: string
     enum:
-      - ROW_STATUS_UNSPECIFIED
-      - NORMAL
-      - ARCHIVED
-    default: ROW_STATUS_UNSPECIFIED
+      - TYPE_UNSPECIFIED
+      - OAUTH2
+    default: TYPE_UNSPECIFIED
   apiv1Shortcut:
     type: object
     properties:
@@ -815,8 +870,6 @@ definitions:
       updatedTime:
         type: string
         format: date-time
-      rowStatus:
-        $ref: '#/definitions/apiv1RowStatus'
       name:
         type: string
       link:
@@ -835,54 +888,74 @@ definitions:
         type: integer
         format: int32
       ogMetadata:
-        $ref: '#/definitions/apiv1OpenGraphMetadata'
+        $ref: '#/definitions/v1ShortcutOpenGraphMetadata'
   apiv1UserSetting:
     type: object
     properties:
-      id:
+      userId:
         type: integer
         format: int32
-        description: id is the user id.
+      general:
+        $ref: '#/definitions/apiv1UserSettingGeneralSetting'
+      accessTokens:
+        $ref: '#/definitions/apiv1UserSettingAccessTokensSetting'
+  apiv1UserSettingAccessTokensSetting:
+    type: object
+    properties:
+      accessTokens:
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/apiv1UserSettingAccessTokensSettingAccessToken'
+        title: Nested repeated field
+  apiv1UserSettingAccessTokensSettingAccessToken:
+    type: object
+    properties:
+      accessToken:
+        type: string
+        description: The access token is a JWT token, including expiration time, issuer, etc.
+      description:
+        type: string
+        description: A description for the access token.
+  apiv1UserSettingGeneralSetting:
+    type: object
+    properties:
       locale:
-        $ref: '#/definitions/UserSettingLocale'
-        description: locale is the user locale.
+        type: string
       colorTheme:
-        $ref: '#/definitions/UserSettingColorTheme'
-        description: color_theme is the user color theme.
+        type: string
   apiv1Visibility:
     type: string
     enum:
       - VISIBILITY_UNSPECIFIED
-      - PRIVATE
       - WORKSPACE
       - PUBLIC
     default: VISIBILITY_UNSPECIFIED
   apiv1WorkspaceSetting:
     type: object
     properties:
-      licenseKey:
-        type: string
-      enableSignup:
-        type: boolean
-        description: Whether to enable other users to sign up.
       instanceUrl:
         type: string
-        description: The instance URL.
-      customStyle:
+        description: The url of instance.
+      branding:
         type: string
-        description: The custom style.
-      customScript:
-        type: string
-        description: The custom script.
-      autoBackup:
-        $ref: '#/definitions/apiv1AutoBackupWorkspaceSetting'
-        title: The auto backup setting. (Unimplemented)
+        format: byte
+        description: The workspace custome branding.
       defaultVisibility:
         $ref: '#/definitions/apiv1Visibility'
         description: The default visibility of shortcuts and collections.
-      faviconProvider:
-        type: string
-        description: The url of custom favicon provider.
+      identityProviders:
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/apiv1IdentityProvider'
+        description: The identity providers.
+      disallowUserRegistration:
+        type: boolean
+        description: Whether to disallow user registration by email&password.
+      disallowPasswordAuth:
+        type: boolean
+        description: Whether to disallow password authentication.
   protobufAny:
     type: object
     properties:
@@ -902,49 +975,6 @@ definitions:
         items:
           type: object
           $ref: '#/definitions/protobufAny'
-  v1CreateCollectionResponse:
-    type: object
-    properties:
-      collection:
-        $ref: '#/definitions/apiv1Collection'
-  v1CreateShortcutResponse:
-    type: object
-    properties:
-      shortcut:
-        $ref: '#/definitions/apiv1Shortcut'
-  v1CreateUserAccessTokenResponse:
-    type: object
-    properties:
-      accessToken:
-        $ref: '#/definitions/v1UserAccessToken'
-  v1CreateUserResponse:
-    type: object
-    properties:
-      user:
-        $ref: '#/definitions/v1User'
-  v1DeleteCollectionResponse:
-    type: object
-  v1DeleteShortcutResponse:
-    type: object
-  v1DeleteUserAccessTokenResponse:
-    type: object
-  v1DeleteUserResponse:
-    type: object
-  v1GetAuthStatusResponse:
-    type: object
-    properties:
-      user:
-        $ref: '#/definitions/v1User'
-  v1GetCollectionByNameResponse:
-    type: object
-    properties:
-      collection:
-        $ref: '#/definitions/apiv1Collection'
-  v1GetCollectionResponse:
-    type: object
-    properties:
-      collection:
-        $ref: '#/definitions/apiv1Collection'
   v1GetShortcutAnalyticsResponse:
     type: object
     properties:
@@ -963,43 +993,6 @@ definitions:
         items:
           type: object
           $ref: '#/definitions/GetShortcutAnalyticsResponseAnalyticsItem'
-  v1GetShortcutByNameResponse:
-    type: object
-    properties:
-      shortcut:
-        $ref: '#/definitions/apiv1Shortcut'
-  v1GetShortcutResponse:
-    type: object
-    properties:
-      shortcut:
-        $ref: '#/definitions/apiv1Shortcut'
-  v1GetSubscriptionResponse:
-    type: object
-    properties:
-      subscription:
-        $ref: '#/definitions/v1Subscription'
-  v1GetUserResponse:
-    type: object
-    properties:
-      user:
-        $ref: '#/definitions/v1User'
-  v1GetUserSettingResponse:
-    type: object
-    properties:
-      userSetting:
-        $ref: '#/definitions/apiv1UserSetting'
-  v1GetWorkspaceProfileResponse:
-    type: object
-    properties:
-      profile:
-        $ref: '#/definitions/v1WorkspaceProfile'
-        description: The workspace profile.
-  v1GetWorkspaceSettingResponse:
-    type: object
-    properties:
-      setting:
-        $ref: '#/definitions/apiv1WorkspaceSetting'
-        description: The user setting.
   v1ListCollectionsResponse:
     type: object
     properties:
@@ -1038,6 +1031,7 @@ definitions:
       - PLAN_TYPE_UNSPECIFIED
       - FREE
       - PRO
+      - ENTERPRISE
     default: PLAN_TYPE_UNSPECIFIED
   v1Role:
     type: string
@@ -1046,18 +1040,22 @@ definitions:
       - ADMIN
       - USER
     default: ROLE_UNSPECIFIED
-  v1SignInResponse:
+  v1ShortcutOpenGraphMetadata:
     type: object
     properties:
-      user:
-        $ref: '#/definitions/v1User'
-  v1SignOutResponse:
-    type: object
-  v1SignUpResponse:
-    type: object
-    properties:
-      user:
-        $ref: '#/definitions/v1User'
+      title:
+        type: string
+      description:
+        type: string
+      image:
+        type: string
+  v1State:
+    type: string
+    enum:
+      - STATE_UNSPECIFIED
+      - ACTIVE
+      - INACTIVE
+    default: STATE_UNSPECIFIED
   v1Subscription:
     type: object
     properties:
@@ -1072,16 +1070,23 @@ definitions:
         type: string
         format: date-time
         readOnly: true
-  v1UpdateCollectionResponse:
-    type: object
-    properties:
-      collection:
-        $ref: '#/definitions/apiv1Collection'
-  v1UpdateShortcutResponse:
-    type: object
-    properties:
-      shortcut:
-        $ref: '#/definitions/apiv1Shortcut'
+      features:
+        type: array
+        items:
+          type: string
+        readOnly: true
+      seats:
+        type: integer
+        format: int32
+        readOnly: true
+      shortcutsLimit:
+        type: integer
+        format: int32
+        readOnly: true
+      collectionsLimit:
+        type: integer
+        format: int32
+        readOnly: true
   v1UpdateSubscriptionRequest:
     type: object
     properties:
@@ -1089,35 +1094,14 @@ definitions:
         type: string
     required:
       - licenseKey
-  v1UpdateSubscriptionResponse:
-    type: object
-    properties:
-      subscription:
-        $ref: '#/definitions/v1Subscription'
-  v1UpdateUserResponse:
-    type: object
-    properties:
-      user:
-        $ref: '#/definitions/v1User'
-  v1UpdateUserSettingResponse:
-    type: object
-    properties:
-      userSetting:
-        $ref: '#/definitions/apiv1UserSetting'
-  v1UpdateWorkspaceSettingResponse:
-    type: object
-    properties:
-      setting:
-        $ref: '#/definitions/apiv1WorkspaceSetting'
-        description: The user setting.
   v1User:
     type: object
     properties:
       id:
         type: integer
         format: int32
-      rowStatus:
-        $ref: '#/definitions/apiv1RowStatus'
+      state:
+        $ref: '#/definitions/v1State'
       createdTime:
         type: string
         format: date-time
@@ -1154,23 +1138,15 @@ definitions:
       version:
         type: string
         description: Current workspace version.
-      plan:
-        $ref: '#/definitions/v1PlanType'
-        description: The workspace plan.
-      enableSignup:
-        type: boolean
-        description: Whether to enable other users to sign up.
-      customStyle:
-        type: string
-        description: The custom style.
-      customScript:
-        type: string
-        description: The custom script.
-      faviconProvider:
-        type: string
-        description: The url of custom favicon provider.
       owner:
         type: string
         title: |-
           The owner name.
           Format: "users/{id}"
+      subscription:
+        $ref: '#/definitions/v1Subscription'
+        description: The workspace subscription.
+      branding:
+        type: string
+        format: byte
+        description: The workspace branding.

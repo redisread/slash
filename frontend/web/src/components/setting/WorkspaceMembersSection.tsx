@@ -1,0 +1,115 @@
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import { showCommonDialog } from "@/components/Alert";
+import CreateUserDialog from "@/components/CreateUserDialog";
+import Icon from "@/components/Icon";
+import { Button } from "@/components/ui/button";
+import { useUserStore } from "@/stores";
+import { User } from "@/types/proto/api/v1/user_service";
+
+const WorkspaceMembersSection = () => {
+  const { t } = useTranslation();
+  const userStore = useUserStore();
+  const [showCreateUserDialog, setShowCreateUserDialog] = useState<boolean>(false);
+  const [currentEditingUser, setCurrentEditingUser] = useState<User | undefined>(undefined);
+  const userList = Object.values(userStore.userMapById);
+
+  useEffect(() => {
+    userStore.fetchUserList();
+  }, []);
+
+  const handleCreateUserDialogClose = () => {
+    setShowCreateUserDialog(false);
+    setCurrentEditingUser(undefined);
+  };
+
+  const handleDeleteUser = async (user: User) => {
+    showCommonDialog({
+      title: "Delete User",
+      content: `Are you sure to delete user \`${user.nickname}\`? You cannot undo this action.`,
+      style: "danger",
+      onConfirm: async () => {
+        try {
+          await userStore.deleteUser(user.id);
+          toast.success(`User \`${user.nickname}\` deleted successfully`);
+        } catch (error: any) {
+          toast.error(`Failed to delete user \`${user.nickname}\`: ${error.details}`);
+        }
+      },
+    });
+  };
+
+  return (
+    <>
+      <div className="w-full flex flex-col sm:flex-row justify-start items-start gap-4 sm:gap-x-16">
+        <p className="sm:w-1/4 text-2xl shrink-0 font-semibold text-foreground">{t("settings.workspace.member.self")}</p>
+        <div className="w-full sm:w-auto grow flex flex-col justify-start items-start gap-4">
+          <div className="w-full flex justify-end">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowCreateUserDialog(true);
+                setCurrentEditingUser(undefined);
+              }}
+            >
+              {t("settings.workspace.member.add")}
+            </Button>
+          </div>
+          <div className="w-full flow-root">
+            <div className="overflow-x-auto">
+              <div className="inline-block border rounded-lg border-border min-w-full align-middle">
+                <table className="min-w-full divide-y divide-border">
+                  <thead>
+                    <tr>
+                      <th scope="col" className="py-3 pl-4 pr-3 text-left text-sm font-semibold text-foreground">
+                        {t("user.nickname")}
+                      </th>
+                      <th scope="col" className="px-3 py-3 text-left text-sm font-semibold text-foreground">
+                        {t("user.email")}
+                      </th>
+                      <th scope="col" className="px-3 py-3 text-left text-sm font-semibold text-foreground">
+                        {t("user.role")}
+                      </th>
+                      <th scope="col" className="relative py-3 pl-3 pr-4">
+                        <span className="sr-only">{t("common.edit")}</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {userList.map((user) => (
+                      <tr key={user.email}>
+                        <td className="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-foreground">{user.nickname}</td>
+                        <td className="whitespace-nowrap px-3 py-2 text-sm text-muted-foreground">{user.email}</td>
+                        <td className="whitespace-nowrap px-3 py-2 text-sm text-muted-foreground">{user.role}</td>
+                        <td className="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => {
+                              setCurrentEditingUser(user);
+                              setShowCreateUserDialog(true);
+                            }}
+                          >
+                            <Icon.PenBox className="w-4 h-auto" />
+                          </Button>
+                          <Button size="sm" variant="ghost" onClick={() => handleDeleteUser(user)}>
+                            <Icon.Trash className="w-4 h-auto" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {showCreateUserDialog && <CreateUserDialog user={currentEditingUser} onClose={handleCreateUserDialogClose} />}
+    </>
+  );
+};
+
+export default WorkspaceMembersSection;

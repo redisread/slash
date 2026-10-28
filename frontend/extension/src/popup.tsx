@@ -1,6 +1,7 @@
 import { Button, Input, CssVarsProvider, Divider, IconButton } from "@mui/joy";
 import { Storage } from "@plasmohq/storage";
-import { useEffect, useState ,useRef} from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
+import type { KeyboardEvent } from "react";
 import { Toaster } from "react-hot-toast";
 import CreateShortcutButton from "@/components/CreateShortcutButton";
 import Icon from "@/components/Icon";
@@ -8,13 +9,12 @@ import Logo from "@/components/Logo";
 import PullShortcutsButton from "@/components/PullShortcutsButton";
 import ShortcutsContainer from "@/components/ShortcutsContainer";
 import { useShortcutStore } from "@/stores";
+import type { Shortcut } from "@/types/proto/api/v1/shortcut_service";
 import Dropdown from "./components/Dropdown";
 import ShortcutView from "./components/ShortcutView";
 import { StorageContextProvider, useStorageContext } from "./context";
 import useColorTheme from "./hooks/useColorTheme";
 import "./style.css";
-import type { KeyboardEvent } from 'react';
-import { Shortcut } from "@/types/proto/api/v1/shortcut_service";
 
 const storage = new Storage();
 
@@ -22,7 +22,7 @@ const IndexPopup = () => {
   useColorTheme();
   const context = useStorageContext();
   const shortcutStore = useShortcutStore();
-  const shortcuts = shortcutStore.getShortcutList();
+  const shortcuts = useMemo(() => Object.values(shortcutStore.shortcutMapById), [shortcutStore.shortcutMapById]);
   const isInitialized = context.instanceUrl && context.accessToken;
 
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -39,11 +39,12 @@ const IndexPopup = () => {
   }, [isInitialized]);
 
   useEffect(() => {
-    const shouldOpenSearch = storage.get("openSearch");
-    if (shouldOpenSearch) {
-      setSelectedSection("Search");
-      storage.remove("openSearch");
-    }
+    void storage.get<boolean>("openSearch").then((shouldOpenSearch) => {
+      if (shouldOpenSearch) {
+        setSelectedSection("Search");
+        void storage.remove("openSearch");
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -63,7 +64,7 @@ const IndexPopup = () => {
               return false; // 如果title不包含termList中的某个项，立即返回false
             }
           }
-          return true; 
+          return true;
         });
         setSearchShortcuts(searchResult);
       } catch (error) {
@@ -72,31 +73,28 @@ const IndexPopup = () => {
     };
     const debounceTimer = setTimeout(fetchResults, 300);
     return () => clearTimeout(debounceTimer);
-  }, [searchTerm]);
-
+  }, [searchTerm, shortcuts]);
 
   useEffect(() => {
     if (selectedIndex >= 0 && resultsRef.current) {
       const selectedElement = resultsRef.current.children[selectedIndex] as HTMLElement;
-      selectedElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      selectedElement.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
   }, [selectedIndex]);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'ArrowDown') {
+    if (event.key === "ArrowDown") {
       event.preventDefault();
-      setSelectedIndex(prev => (prev < searchShortcuts.length - 1 ? prev + 1 : prev));
-    } else if (event.key === 'ArrowUp') {
+      setSelectedIndex((prev) => (prev < searchShortcuts.length - 1 ? prev + 1 : prev));
+    } else if (event.key === "ArrowUp") {
       event.preventDefault();
-      setSelectedIndex(prev => (prev > 0 ? prev - 1 : prev));
-    } else if (event.key === 'Enter' && selectedIndex !== -1) {
-        event.preventDefault();
-        const shortcutLink = `${context.instanceUrl}/s/${searchShortcuts[selectedIndex].name}`;
-        window.open(shortcutLink, '_blank');
-      }
+      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev));
+    } else if (event.key === "Enter" && selectedIndex !== -1) {
+      event.preventDefault();
+      const shortcutLink = `${context.instanceUrl}/s/${searchShortcuts[selectedIndex].name}`;
+      window.open(shortcutLink, "_blank");
+    }
   };
-
-
 
   const handleSettingButtonClick = () => {
     chrome.runtime.openOptionsPage();
@@ -104,7 +102,6 @@ const IndexPopup = () => {
 
   const handleRefreshButtonClick = () => {
     chrome.runtime.reload();
-    chrome.browserAction.setPopup({ popup: "" });
   };
 
   return (
@@ -170,8 +167,8 @@ const IndexPopup = () => {
               />
               {searchShortcuts.length !== 0 ? (
                 <div ref={resultsRef} className="w-full flex flex-col justify-start items-start gap-2">
-                  {searchShortcuts.map((shortcut,index) => {
-                    return <ShortcutView key={shortcut.id} shortcut={shortcut} selected={selectedIndex === index}/>;
+                  {searchShortcuts.map((shortcut, index) => {
+                    return <ShortcutView key={shortcut.id} shortcut={shortcut} selected={selectedIndex === index} />;
                   })}
                 </div>
               ) : (

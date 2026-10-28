@@ -1,7 +1,7 @@
 import axios from "axios";
 import { create } from "zustand";
 import { combine } from "zustand/middleware";
-import { CreateShortcutResponse, ListShortcutsResponse, Shortcut } from "@/types/proto/api/v1/shortcut_service";
+import type { ListShortcutsResponse, Shortcut } from "@/types/proto/api/v1/shortcut_service";
 
 interface State {
   shortcutMapById: Record<number, Shortcut>;
@@ -23,8 +23,8 @@ const useShortcutStore = create(
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      const shortcutMap = get().shortcutMapById;
-      shortcuts.forEach((shortcut) => {
+      const shortcutMap: Record<number, Shortcut> = {};
+      (shortcuts || []).forEach((shortcut) => {
         shortcutMap[shortcut.id] = shortcut;
       });
       set({ shortcutMapById: shortcutMap });
@@ -33,18 +33,17 @@ const useShortcutStore = create(
     getShortcutList: () => {
       return Object.values(get().shortcutMapById);
     },
-    createShortcut: async (instanceUrl: string, accessToken: string, create: Shortcut) => {
-      const {
-        data: { shortcut },
-      } = await axios.post<CreateShortcutResponse>(`${instanceUrl}/api/v1/shortcuts`, create, {
+    createShortcut: async (instanceUrl: string, accessToken: string, create: Omit<Shortcut, "id">) => {
+      const { data } = await axios.post<Shortcut>(`${instanceUrl}/api/v1/shortcuts`, create, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      if (!shortcut) {
+      const shortcut = data;
+      if (!shortcut.id) {
         throw new Error(`Failed to create shortcut`);
       }
-      const shortcutMap = get().shortcutMapById;
+      const shortcutMap = { ...get().shortcutMapById };
       shortcutMap[shortcut.id] = shortcut;
       set({ shortcutMapById: shortcutMap });
       return shortcut;

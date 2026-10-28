@@ -6,6 +6,8 @@
 - [store/activity.proto](#store_activity-proto)
     - [ActivityShorcutCreatePayload](#slash-store-ActivityShorcutCreatePayload)
     - [ActivityShorcutViewPayload](#slash-store-ActivityShorcutViewPayload)
+    - [ActivityShorcutViewPayload.ParamsEntry](#slash-store-ActivityShorcutViewPayload-ParamsEntry)
+    - [ActivityShorcutViewPayload.ValueList](#slash-store-ActivityShorcutViewPayload-ValueList)
   
 - [store/common.proto](#store_common-proto)
     - [RowStatus](#slash-store-RowStatus)
@@ -14,22 +16,32 @@
 - [store/collection.proto](#store_collection-proto)
     - [Collection](#slash-store-Collection)
   
+- [store/idp.proto](#store_idp-proto)
+    - [IdentityProvider](#slash-store-IdentityProvider)
+    - [IdentityProviderConfig](#slash-store-IdentityProviderConfig)
+    - [IdentityProviderConfig.FieldMapping](#slash-store-IdentityProviderConfig-FieldMapping)
+    - [IdentityProviderConfig.OAuth2Config](#slash-store-IdentityProviderConfig-OAuth2Config)
+  
+    - [IdentityProvider.Type](#slash-store-IdentityProvider-Type)
+  
 - [store/shortcut.proto](#store_shortcut-proto)
     - [OpenGraphMetadata](#slash-store-OpenGraphMetadata)
     - [Shortcut](#slash-store-Shortcut)
   
 - [store/user_setting.proto](#store_user_setting-proto)
-    - [AccessTokensUserSetting](#slash-store-AccessTokensUserSetting)
-    - [AccessTokensUserSetting.AccessToken](#slash-store-AccessTokensUserSetting-AccessToken)
     - [UserSetting](#slash-store-UserSetting)
+    - [UserSetting.AccessTokensSetting](#slash-store-UserSetting-AccessTokensSetting)
+    - [UserSetting.AccessTokensSetting.AccessToken](#slash-store-UserSetting-AccessTokensSetting-AccessToken)
+    - [UserSetting.GeneralSetting](#slash-store-UserSetting-GeneralSetting)
   
-    - [ColorThemeUserSetting](#slash-store-ColorThemeUserSetting)
-    - [LocaleUserSetting](#slash-store-LocaleUserSetting)
     - [UserSettingKey](#slash-store-UserSettingKey)
   
 - [store/workspace_setting.proto](#store_workspace_setting-proto)
-    - [AutoBackupWorkspaceSetting](#slash-store-AutoBackupWorkspaceSetting)
     - [WorkspaceSetting](#slash-store-WorkspaceSetting)
+    - [WorkspaceSetting.GeneralSetting](#slash-store-WorkspaceSetting-GeneralSetting)
+    - [WorkspaceSetting.IdentityProviderSetting](#slash-store-WorkspaceSetting-IdentityProviderSetting)
+    - [WorkspaceSetting.SecuritySetting](#slash-store-WorkspaceSetting-SecuritySetting)
+    - [WorkspaceSetting.ShortcutRelatedSetting](#slash-store-WorkspaceSetting-ShortcutRelatedSetting)
   
     - [WorkspaceSettingKey](#slash-store-WorkspaceSettingKey)
   
@@ -71,6 +83,38 @@
 | ip | [string](#string) |  |  |
 | referer | [string](#string) |  |  |
 | user_agent | [string](#string) |  |  |
+| params | [ActivityShorcutViewPayload.ParamsEntry](#slash-store-ActivityShorcutViewPayload-ParamsEntry) | repeated |  |
+
+
+
+
+
+
+<a name="slash-store-ActivityShorcutViewPayload-ParamsEntry"></a>
+
+### ActivityShorcutViewPayload.ParamsEntry
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| key | [string](#string) |  |  |
+| value | [ActivityShorcutViewPayload.ValueList](#slash-store-ActivityShorcutViewPayload-ValueList) |  |  |
+
+
+
+
+
+
+<a name="slash-store-ActivityShorcutViewPayload-ValueList"></a>
+
+### ActivityShorcutViewPayload.ValueList
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| values | [string](#string) | repeated |  |
 
 
 
@@ -116,9 +160,8 @@
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | VISIBILITY_UNSPECIFIED | 0 |  |
-| PRIVATE | 1 |  |
-| WORKSPACE | 2 |  |
-| PUBLIC | 3 |  |
+| WORKSPACE | 1 |  |
+| PUBLIC | 2 |  |
 
 
  
@@ -168,6 +211,104 @@
 
 
 
+<a name="store_idp-proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## store/idp.proto
+
+
+
+<a name="slash-store-IdentityProvider"></a>
+
+### IdentityProvider
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  | The unique identifier of the identity provider. |
+| title | [string](#string) |  |  |
+| type | [IdentityProvider.Type](#slash-store-IdentityProvider-Type) |  |  |
+| config | [IdentityProviderConfig](#slash-store-IdentityProviderConfig) |  |  |
+
+
+
+
+
+
+<a name="slash-store-IdentityProviderConfig"></a>
+
+### IdentityProviderConfig
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| oauth2 | [IdentityProviderConfig.OAuth2Config](#slash-store-IdentityProviderConfig-OAuth2Config) |  |  |
+
+
+
+
+
+
+<a name="slash-store-IdentityProviderConfig-FieldMapping"></a>
+
+### IdentityProviderConfig.FieldMapping
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| identifier | [string](#string) |  |  |
+| display_name | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="slash-store-IdentityProviderConfig-OAuth2Config"></a>
+
+### IdentityProviderConfig.OAuth2Config
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| client_id | [string](#string) |  |  |
+| client_secret | [string](#string) |  |  |
+| auth_url | [string](#string) |  |  |
+| token_url | [string](#string) |  |  |
+| user_info_url | [string](#string) |  |  |
+| scopes | [string](#string) | repeated |  |
+| field_mapping | [IdentityProviderConfig.FieldMapping](#slash-store-IdentityProviderConfig-FieldMapping) |  |  |
+
+
+
+
+
+ 
+
+
+<a name="slash-store-IdentityProvider-Type"></a>
+
+### IdentityProvider.Type
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| TYPE_UNSPECIFIED | 0 |  |
+| OAUTH2 | 1 |  |
+
+
+ 
+
+ 
+
+ 
+
+
+
 <a name="store_shortcut-proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
@@ -204,7 +345,6 @@
 | creator_id | [int32](#int32) |  |  |
 | created_ts | [int64](#int64) |  |  |
 | updated_ts | [int64](#int64) |  |  |
-| row_status | [RowStatus](#slash-store-RowStatus) |  |  |
 | name | [string](#string) |  |  |
 | link | [string](#string) |  |  |
 | title | [string](#string) |  |  |
@@ -234,37 +374,6 @@
 
 
 
-<a name="slash-store-AccessTokensUserSetting"></a>
-
-### AccessTokensUserSetting
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| access_tokens | [AccessTokensUserSetting.AccessToken](#slash-store-AccessTokensUserSetting-AccessToken) | repeated |  |
-
-
-
-
-
-
-<a name="slash-store-AccessTokensUserSetting-AccessToken"></a>
-
-### AccessTokensUserSetting.AccessToken
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| access_token | [string](#string) |  | The access token is a JWT token. Including expiration time, issuer, etc. |
-| description | [string](#string) |  | A description for the access token. |
-
-
-
-
-
-
 <a name="slash-store-UserSetting"></a>
 
 ### UserSetting
@@ -275,43 +384,61 @@
 | ----- | ---- | ----- | ----------- |
 | user_id | [int32](#int32) |  |  |
 | key | [UserSettingKey](#slash-store-UserSettingKey) |  |  |
-| access_tokens | [AccessTokensUserSetting](#slash-store-AccessTokensUserSetting) |  |  |
-| locale | [LocaleUserSetting](#slash-store-LocaleUserSetting) |  |  |
-| color_theme | [ColorThemeUserSetting](#slash-store-ColorThemeUserSetting) |  |  |
+| general | [UserSetting.GeneralSetting](#slash-store-UserSetting-GeneralSetting) |  |  |
+| access_tokens | [UserSetting.AccessTokensSetting](#slash-store-UserSetting-AccessTokensSetting) |  |  |
+
+
+
+
+
+
+<a name="slash-store-UserSetting-AccessTokensSetting"></a>
+
+### UserSetting.AccessTokensSetting
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| access_tokens | [UserSetting.AccessTokensSetting.AccessToken](#slash-store-UserSetting-AccessTokensSetting-AccessToken) | repeated | Nested repeated field |
+
+
+
+
+
+
+<a name="slash-store-UserSetting-AccessTokensSetting-AccessToken"></a>
+
+### UserSetting.AccessTokensSetting.AccessToken
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| access_token | [string](#string) |  | The access token is a JWT token, including expiration time, issuer, etc. |
+| description | [string](#string) |  | A description for the access token. |
+
+
+
+
+
+
+<a name="slash-store-UserSetting-GeneralSetting"></a>
+
+### UserSetting.GeneralSetting
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| locale | [string](#string) |  |  |
+| color_theme | [string](#string) |  |  |
 
 
 
 
 
  
-
-
-<a name="slash-store-ColorThemeUserSetting"></a>
-
-### ColorThemeUserSetting
-
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| COLOR_THEME_USER_SETTING_UNSPECIFIED | 0 |  |
-| SYSTEM | 1 |  |
-| LIGHT | 2 |  |
-| DARK | 3 |  |
-
-
-
-<a name="slash-store-LocaleUserSetting"></a>
-
-### LocaleUserSetting
-
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| LOCALE_USER_SETTING_UNSPECIFIED | 0 |  |
-| EN | 1 |  |
-| ZH | 2 |  |
-| FR | 3 |  |
-
 
 
 <a name="slash-store-UserSettingKey"></a>
@@ -322,9 +449,8 @@
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | USER_SETTING_KEY_UNSPECIFIED | 0 |  |
-| ACCESS_TOKENS | 1 | Access tokens for the user. |
-| LOCALE | 2 | Locale for the user. |
-| COLOR_THEME | 3 | Color theme for the user. |
+| USER_SETTING_GENERAL | 1 | User general settings. |
+| USER_SETTING_ACCESS_TOKENS | 2 | User access tokens. |
 
 
  
@@ -342,23 +468,6 @@
 
 
 
-<a name="slash-store-AutoBackupWorkspaceSetting"></a>
-
-### AutoBackupWorkspaceSetting
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| enabled | [bool](#bool) |  | Whether auto backup is enabled. |
-| cron_expression | [string](#string) |  | The cron expression for auto backup. For example, &#34;0 0 0 * * *&#34; means backup at 00:00:00 every day. See https://en.wikipedia.org/wiki/Cron for more details. |
-| max_keep | [int32](#int32) |  | The maximum number of backups to keep. |
-
-
-
-
-
-
 <a name="slash-store-WorkspaceSetting"></a>
 
 ### WorkspaceSetting
@@ -368,15 +477,75 @@
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | key | [WorkspaceSettingKey](#slash-store-WorkspaceSettingKey) |  |  |
-| license_key | [string](#string) |  | The license key of workspace. |
-| secret_session | [string](#string) |  | The secret session key used to encrypt session data. |
-| enable_signup | [bool](#bool) |  | Whether to enable other users to sign up. |
-| custom_style | [string](#string) |  | The custom style. |
-| custom_script | [string](#string) |  | The custom script. |
-| auto_backup | [AutoBackupWorkspaceSetting](#slash-store-AutoBackupWorkspaceSetting) |  | The auto backup setting. (Unimplemented) |
-| instance_url | [string](#string) |  | The instance URL of workspace. |
-| default_visibility | [Visibility](#slash-store-Visibility) |  | The default visibility of shortcuts and collections. |
-| favicon_provider | [string](#string) |  | The url of custom favicon provider. e.g. https://github.com/yourselfhosted/favicons |
+| raw | [string](#string) |  |  |
+| general | [WorkspaceSetting.GeneralSetting](#slash-store-WorkspaceSetting-GeneralSetting) |  |  |
+| security | [WorkspaceSetting.SecuritySetting](#slash-store-WorkspaceSetting-SecuritySetting) |  |  |
+| shortcut_related | [WorkspaceSetting.ShortcutRelatedSetting](#slash-store-WorkspaceSetting-ShortcutRelatedSetting) |  |  |
+| identity_provider | [WorkspaceSetting.IdentityProviderSetting](#slash-store-WorkspaceSetting-IdentityProviderSetting) |  |  |
+
+
+
+
+
+
+<a name="slash-store-WorkspaceSetting-GeneralSetting"></a>
+
+### WorkspaceSetting.GeneralSetting
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| secret_session | [string](#string) |  |  |
+| license_key | [string](#string) |  |  |
+| instance_url | [string](#string) |  |  |
+| branding | [bytes](#bytes) |  |  |
+
+
+
+
+
+
+<a name="slash-store-WorkspaceSetting-IdentityProviderSetting"></a>
+
+### WorkspaceSetting.IdentityProviderSetting
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| identity_providers | [IdentityProvider](#slash-store-IdentityProvider) | repeated |  |
+
+
+
+
+
+
+<a name="slash-store-WorkspaceSetting-SecuritySetting"></a>
+
+### WorkspaceSetting.SecuritySetting
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| disallow_user_registration | [bool](#bool) |  |  |
+| disallow_password_auth | [bool](#bool) |  |  |
+
+
+
+
+
+
+<a name="slash-store-WorkspaceSetting-ShortcutRelatedSetting"></a>
+
+### WorkspaceSetting.ShortcutRelatedSetting
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| default_visibility | [Visibility](#slash-store-Visibility) |  |  |
 
 
 
@@ -393,15 +562,13 @@
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | WORKSPACE_SETTING_KEY_UNSPECIFIED | 0 |  |
-| WORKSPACE_SETTING_LICENSE_KEY | 1 | The license key. |
-| WORKSPACE_SETTING_SECRET_SESSION | 2 | The secret session key used to encrypt session data. |
-| WORKSAPCE_SETTING_ENABLE_SIGNUP | 3 | Whether to enable other users to sign up. |
-| WORKSPACE_SETTING_CUSTOM_STYLE | 4 | The custom style. |
-| WORKSPACE_SETTING_CUSTOM_SCRIPT | 5 | The custom script. |
-| WORKSPACE_SETTING_AUTO_BACKUP | 6 | The auto backup setting. |
-| WORKSPACE_SETTING_INSTANCE_URL | 7 | The instance URL. |
-| WORKSPACE_SETTING_DEFAULT_VISIBILITY | 8 | The default visibility of shortcuts and collections. |
-| WORKSPACE_SETTING_FAVICON_PROVIDER | 9 | The url of custom favicon provider. |
+| WORKSPACE_SETTING_GENERAL | 1 | Workspace general settings. |
+| WORKSPACE_SETTING_SECURITY | 2 | Workspace security settings. |
+| WORKSPACE_SETTING_SHORTCUT_RELATED | 3 | Workspace shortcut-related settings. |
+| WORKSPACE_SETTING_IDENTITY_PROVIDER | 4 | Workspace identity provider settings. |
+| WORKSPACE_SETTING_LICENSE_KEY | 10 | TODO: remove the following keys. The license key. |
+| WORKSPACE_SETTING_SECRET_SESSION | 11 | The secret session key used to encrypt session data. |
+| WORKSPACE_SETTING_DEFAULT_VISIBILITY | 13 | The default visibility of shortcuts and collections. |
 
 
  

@@ -7,7 +7,6 @@ interface ShortcutsContainerProps {
   limit?: number;
 }
 
-
 const ShortcutsContainer = (props: ShortcutsContainerProps) => {
   const { limit } = props;
   const shortcuts = useShortcutStore().getShortcutList();
@@ -21,11 +20,11 @@ const ShortcutsContainer = (props: ShortcutsContainerProps) => {
         </a>
       </div>
       <div className={classNames("w-full flex flex-row justify-start items-start flex-wrap gap-2")}>
-        {
-          limit ? shortcuts.slice(0, limit).map((shortcut) => {
-            return <ShortcutView key={shortcut.id} shortcut={shortcut} />;
-          }) :
-            shortcuts.map((shortcut) => {
+        {limit
+          ? shortcuts.slice(0, limit).map((shortcut) => {
+              return <ShortcutView key={shortcut.id} shortcut={shortcut} />;
+            })
+          : shortcuts.map((shortcut) => {
               return <ShortcutView key={shortcut.id} shortcut={shortcut} />;
             })}
       </div>

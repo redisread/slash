@@ -11,7 +11,7 @@ const StorageContextProvider = ({ children }: Props) => {
   const storage = new Storage();
   const [instanceUrl, setInstanceUrl] = useState<string | undefined>(undefined);
   const [accessToken, setAccessToken] = useState<string | undefined>(undefined);
-  const [defaultVisibility, setDefaultVisibility] = useState<Visibility>(Visibility.PRIVATE);
+  const [defaultVisibility, setDefaultVisibility] = useState<Visibility>(Visibility.WORKSPACE);
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
@@ -30,7 +30,7 @@ const StorageContextProvider = ({ children }: Props) => {
 
       setInstanceUrl(instanceUrl);
       setAccessToken(accessToken);
-      setDefaultVisibility(defaultVisibility);
+      setDefaultVisibility(defaultVisibility === Visibility.PUBLIC ? Visibility.PUBLIC : Visibility.WORKSPACE);
       setIsInitialized(true);
     })();
 

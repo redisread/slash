@@ -9,12 +9,11 @@ import (
 type UpdateShortcut struct {
 	ID int32
 
-	RowStatus         *RowStatus
 	Name              *string
 	Link              *string
 	Title             *string
 	Description       *string
-	Visibility        *Visibility
+	Visibility        *storepb.Visibility
 	Tag               *string
 	OpenGraphMetadata *storepb.OpenGraphMetadata
 }
@@ -22,9 +21,8 @@ type UpdateShortcut struct {
 type FindShortcut struct {
 	ID             *int32
 	CreatorID      *int32
-	RowStatus      *RowStatus
 	Name           *string
-	VisibilityList []Visibility
+	VisibilityList []storepb.Visibility
 	Tag            *string
 }
 
@@ -64,7 +62,9 @@ func (s *Store) ListShortcuts(ctx context.Context, find *FindShortcut) ([]*store
 func (s *Store) GetShortcut(ctx context.Context, find *FindShortcut) (*storepb.Shortcut, error) {
 	if find.ID != nil {
 		if cache, ok := s.shortcutCache.Load(*find.ID); ok {
-			return cache.(*storepb.Shortcut), nil
+			if shortcut, ok := cache.(*storepb.Shortcut); ok {
+				return shortcut, nil
+			}
 		}
 	}
 

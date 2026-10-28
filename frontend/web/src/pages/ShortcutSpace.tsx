@@ -1,8 +1,8 @@
-import { Button } from "@mui/joy";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
 import CreateShortcutDrawer from "@/components/CreateShortcutDrawer";
+import { Button } from "@/components/ui/button";
 import { isURL } from "@/helpers/utils";
 import useNavigateTo from "@/hooks/useNavigateTo";
 import { useShortcutStore, useUserStore } from "@/stores";
@@ -10,6 +10,7 @@ import { Shortcut } from "@/types/proto/api/v1/shortcut_service";
 
 const ShortcutSpace = () => {
   const params = useParams();
+  const [searchParams] = useSearchParams();
   const shortcutName = params["*"] || "";
   const navigateTo = useNavigateTo();
   const userStore = useUserStore();
@@ -50,7 +51,7 @@ const ShortcutSpace = () => {
             Shortcut <span className="font-mono">{shortcutName}</span> Not Found.
           </p>
           <div className="mt-4">
-            <Button variant="plain" size="sm" onClick={() => setShowCreateShortcutDrawer(true)}>
+            <Button variant="ghost" size="sm" onClick={() => setShowCreateShortcutDrawer(true)}>
               👉 Click here to create it
             </Button>
           </div>
@@ -69,7 +70,11 @@ const ShortcutSpace = () => {
   // If shortcut is a URL, redirect to it directly.
   if (isURL(shortcut.link)) {
     window.document.title = "Redirecting...";
-    window.location.href = shortcut.link;
+    const url = new URL(shortcut.link);
+    searchParams.forEach((value, key) => {
+      url.searchParams.append(key, value);
+    });
+    window.location.href = url.toString();
     return null;
   }
 

@@ -13,7 +13,7 @@ interface Context {
 export const StorageContext = createContext<Context>({
   instanceUrl: undefined,
   accessToken: undefined,
-  defaultVisibility: Visibility.PRIVATE,
+  defaultVisibility: Visibility.WORKSPACE,
   setInstanceUrl: () => {},
   setAccessToken: () => {},
   setDefaultVisibility: () => {},
