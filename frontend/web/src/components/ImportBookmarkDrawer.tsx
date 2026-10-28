@@ -1,19 +1,14 @@
-import { Button, DialogActions, DialogContent, DialogTitle, Divider, Drawer, Input, ModalClose, Radio, RadioGroup, Textarea } from "@mui/joy";
-import { Typography, Sheet, Stack } from "@mui/joy";
-import classnames from "classnames";
-import { isUndefined, uniq } from "lodash-es";
-import { useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetBody, SheetFooter } from "@/components/ui/sheet";
 import { parseBookmarks, generateRandomName } from "@/helpers/fileParse";
 import useLoading from "@/hooks/useLoading";
-import { useWorkspaceStore, useShortcutStore } from "@/stores";
-import { getShortcutUpdateMask } from "@/stores/shortcut";
+import { useShortcutStore } from "@/stores";
 import { Visibility } from "@/types/proto/api/v1/common";
 import { Shortcut } from "@/types/proto/api/v1/shortcut_service";
-import { convertVisibilityFromPb } from "@/utils/visibility";
-import Icon from "./Icon";
-
 
 interface Props {
   onClose: () => void;
@@ -22,25 +17,24 @@ interface Props {
 }
 
 interface ImportBookmarkState {
-    processedContent: boolean;
-    processedBookmarkNums: number;
-    existNum: number;
+  processedContent: boolean;
+  processedBookmarkNums: number;
+  existNum: number;
 }
 
 const ImportBookmarkDrawer: React.FC<Props> = (props: Props) => {
-  const { onClose, onConfirm ,shortcutList} = props;
+  const { onClose, shortcutList } = props;
 
   const { t } = useTranslation();
   const shortcutStore = useShortcutStore();
-  const workspaceStore = useWorkspaceStore();
   const requestState = useLoading(false);
-//   const loadingState = useLoading(false);
+  //   const loadingState = useLoading(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const [state, setState] = useState<ImportBookmarkState>({
     processedContent: false,
     processedBookmarkNums: 0,
-    existNum:0
+    existNum: 0,
   });
 
   // 部分更新
@@ -51,13 +45,11 @@ const ImportBookmarkDrawer: React.FC<Props> = (props: Props) => {
     });
   };
 
-
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       setSelectedFile(event.target.files[0]);
     }
   };
-
 
   const handleUpload = () => {
     if (selectedFile) {
@@ -84,75 +76,70 @@ const ImportBookmarkDrawer: React.FC<Props> = (props: Props) => {
           });
         });
 
-
         const existShortcutListMap = new Map<string, Shortcut>();
-        shortcutList.forEach(shortcut => {
-            existShortcutListMap.set(shortcut.link, shortcut);
-
+        shortcutList.forEach((shortcut) => {
+          existShortcutListMap.set(shortcut.link, shortcut);
         });
         let existNum = 0;
         let createNum = 0;
         shortcuts.forEach((shortcut) => {
           // 如果存在则条跳过，针对导入书签的情况
           if (existShortcutListMap.has(shortcut.link)) {
-            existNum ++;
+            existNum++;
           } else {
             // 不存在才创建
-            const createShortcut = shortcutStore.createShortcut(shortcut);
+            void shortcutStore.createShortcut(shortcut);
             createNum++;
           }
         });
-        console.log("createNum", createNum," existNum", existNum);
+        console.log("createNum", createNum, " existNum", existNum);
         setPartialState({
           processedContent: true,
           processedBookmarkNums: createNum,
           existNum: existNum,
         });
-        toast.success("createNum:"+ createNum+" existNum:"+existNum);
+        toast.success("createNum:" + createNum + " existNum:" + existNum);
       };
       reader.readAsText(selectedFile);
     }
   };
 
   return (
-    <Drawer anchor="right" open={true} onClose={onClose}>
-      <DialogTitle>导入浏览器书签</DialogTitle>
-      <ModalClose />
-      <DialogContent className="w-full max-w-full">
-        <div className="overflow-y-auto w-full mt-2 px-4 pb-4 sm:w-[24rem]">
-            
-          <Sheet sx={{ maxWidth: 500, margin: "auto", padding: 3 }}>
-            <Stack spacing={2}>
-              <Typography level="h3">选择文件上传</Typography>
-              <p>url已存在的话默认会跳过</p>
-              <Button component="label" role={undefined} tabIndex={-1} variant="outlined" color="neutral">
-              {selectedFile ? selectedFile.name : "上传HTML书签内容"}
-                <input type="file" accept=".html" onChange={handleFileChange} style={{ display: "none" }} />
-              </Button>
-            </Stack>
-          </Sheet>
+    <Sheet open={true} onOpenChange={onClose}>
+      <SheetContent className="w-full sm:max-w-md">
+        <SheetHeader>
+          <SheetTitle>导入浏览器书签</SheetTitle>
+        </SheetHeader>
+        <SheetBody>
+          <div className="overflow-y-auto w-full mt-2 px-4 pb-4 sm:w-[24rem]">
+            <div className="space-y-3">
+              <label htmlFor="bookmarks-file">选择 HTML 书签文件</label>
+              <p>URL 已存在时会跳过</p>
+              <Input id="bookmarks-file" type="file" accept=".html" onChange={handleFileChange} />
+            </div>
 
-          {state.processedContent &&
-           (
-            <>
-            <Divider className="text-gray-500">结果</Divider>
-            <p>导入书签成功 处理总数:{state.processedBookmarkNums} 跳过数:{state.existNum}</p>
-            </>
-           )}
-          
-        </div>
-      </DialogContent>
-      <DialogActions>
-        <div className="w-full flex flex-row justify-end items-center px-3 py-4 space-x-2">
-          <Button color="neutral" variant="plain" disabled={requestState.isLoading} loading={requestState.isLoading} onClick={onClose}>
-            {t("common.cancel")}
-          </Button>
-          <Button color="primary" disabled={requestState.isLoading || !selectedFile} loading={requestState.isLoading} onClick={handleUpload}>
-            解析
-          </Button>
-        </div>
-      </DialogActions>
-    </Drawer>
+            {state.processedContent && (
+              <>
+                <h3>结果</h3>
+                <p>
+                  导入书签成功 处理总数:{state.processedBookmarkNums} 跳过数:{state.existNum}
+                </p>
+              </>
+            )}
+          </div>
+        </SheetBody>
+        <SheetFooter>
+          <div className="w-full flex flex-row justify-end items-center px-3 py-4 space-x-2">
+            <Button variant="outline" disabled={requestState.isLoading} onClick={onClose}>
+              {t("common.cancel")}
+            </Button>
+            <Button disabled={requestState.isLoading || !selectedFile} onClick={handleUpload}>
+              解析
+            </Button>
+          </div>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 };
 

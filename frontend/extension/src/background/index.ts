@@ -1,28 +1,14 @@
 import { Storage } from "@plasmohq/storage";
-import { sendToContentScript } from "@plasmohq/messaging";
-import type { PlasmoMessaging } from "@plasmohq/messaging"
 
 const storage = new Storage();
 const urlRegex = /https?:\/\/s\/(.+)/;
 
-
-// chrome.commands.onCommand.addListener((command) => {
-//   if (command === "toggle-search-overlay") {
-//     console.log("toggle-search-overlay background.ts");
-//     sendToContentScript(
-//       { name: "toggleSearchOverlay" ,  body: {}}
-//     );
-//   }
-// });
-
-
-
-chrome.commands.onCommand.addListener((command) => {
+chrome.commands.onCommand.addListener(async (command) => {
   if (command === "open-search") {
-    console.log("open-search background.ts");
-    chrome.action.openPopup(() => {storage.set("openSearch", true)});
+    await storage.set("openSearch", true);
+    await chrome.action.openPopup();
   }
-})
+});
 
 chrome.webRequest.onBeforeRequest.addListener(
   (param) => {
@@ -30,15 +16,17 @@ chrome.webRequest.onBeforeRequest.addListener(
       if (!param.url) {
         return;
       }
-      console.log("url :" ,param.url);
+
       const shortcutName = getShortcutNameFromUrl(param.url);
       if (shortcutName) {
-        const instanceUrl = (await storage.getItem<string>("domain")) || (await storage.getItem<string>("instance_url")) || "";
-        return chrome.tabs.update({ url: `${instanceUrl}/s/${shortcutName}` });
+        const instanceUrl = (await storage.getItem<string>("instance_url")) || "";
+        const url = new URL(`/s/${shortcutName}`, instanceUrl);
+        return chrome.tabs.update({ url: url.toString() });
       }
     })();
+    return {};
   },
-  { urls: ["*://s/*", "*://*/search*"] },
+  { urls: ["*://s/*", "*://*/search*", "*://*/s*", "*://duckduckgo.com/*"] },
 );
 
 const getShortcutNameFromUrl = (urlString: string) => {
@@ -51,19 +39,19 @@ const getShortcutNameFromUrl = (urlString: string) => {
 
 const getShortcutNameFromSearchUrl = (urlString: string) => {
   const url = new URL(urlString);
-  if ((url.hostname === "www.google.com" || url.hostname === "www.bing.com") && url.pathname === "/search") {
+  if ((url.hostname.endsWith("google.com") || url.hostname.endsWith("bing.com")) && url.pathname === "/search") {
     const params = new URLSearchParams(url.search);
     const shortcutName = params.get("q");
     if (typeof shortcutName === "string" && shortcutName.startsWith("s/")) {
       return shortcutName.slice(2);
     }
-  } else if (url.hostname === "www.baidu.com" && url.pathname === "/s") {
+  } else if (url.hostname.endsWith("baidu.com") && url.pathname === "/s") {
     const params = new URLSearchParams(url.search);
     const shortcutName = params.get("wd");
     if (typeof shortcutName === "string" && shortcutName.startsWith("s/")) {
       return shortcutName.slice(2);
     }
-  } else if (url.hostname === "duckduckgo.com" && url.pathname === "/") {
+  } else if (url.hostname.endsWith("duckduckgo.com") && url.pathname === "/") {
     const params = new URLSearchParams(url.search);
     const shortcutName = params.get("q");
     if (typeof shortcutName === "string" && shortcutName.startsWith("s/")) {
@@ -72,4 +60,3 @@ const getShortcutNameFromSearchUrl = (urlString: string) => {
   }
   return "";
 };
-

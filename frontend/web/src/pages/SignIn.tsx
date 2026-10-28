@@ -1,109 +1,79 @@
-import { Button, Input } from "@mui/joy";
-import React, { FormEvent, useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import Icon from "@/components/Icon";
-import { authServiceClient } from "@/grpcweb";
-import useLoading from "@/hooks/useLoading";
-import useNavigateTo from "@/hooks/useNavigateTo";
-import { useUserStore, useWorkspaceStore } from "@/stores";
+import { toast } from "sonner";
+import Logo from "@/components/Logo";
+import PasswordAuthForm from "@/components/PasswordAuthForm";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { absolutifyLink } from "@/helpers/utils";
+import { useWorkspaceStore } from "@/stores";
+import { IdentityProvider, IdentityProvider_Type } from "@/types/proto/api/v1/workspace_service";
 
 const SignIn: React.FC = () => {
   const { t } = useTranslation();
-  const navigateTo = useNavigateTo();
   const workspaceStore = useWorkspaceStore();
-  const userStore = useUserStore();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const actionBtnLoadingState = useLoading(false);
-  const allowConfirm = email.length > 0 && password.length > 0;
 
-  useEffect(() => {
-    if (workspaceStore.profile.mode === "demo") {
-      setEmail("steven@yourselfhosted.com");
-      setPassword("secret");
-    }
-  }, []);
-
-  const handleEmailInputChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const text = e.target.value as string;
-    setEmail(text);
-  };
-
-  const handlePasswordInputChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const text = e.target.value as string;
-    setPassword(text);
-  };
-
-  const handleSigninBtnClick = async (e: FormEvent) => {
-    e.preventDefault();
-    if (actionBtnLoadingState.isLoading) {
-      return;
-    }
-
-    try {
-      actionBtnLoadingState.setLoading();
-      const { user } = await authServiceClient.signIn({ email, password });
-      if (user) {
-        userStore.setCurrentUserId(user.id);
-        await userStore.fetchCurrentUser();
-        navigateTo("/");
-      } else {
-        toast.error("Signin failed");
+  const handleSignInWithIdentityProvider = async (identityProvider: IdentityProvider) => {
+    const stateQueryParameter = identityProvider.id;
+    if (identityProvider.type === IdentityProvider_Type.OAUTH2) {
+      const redirectUri = absolutifyLink("/auth/callback");
+      const oauth2Config = identityProvider.config?.oauth2;
+      if (!oauth2Config) {
+        toast.error("Identity provider configuration is invalid.");
+        return;
       }
-    } catch (error: any) {
-      console.error(error);
-      toast.error(error.details);
+      const authUrl = `${oauth2Config.authUrl}?client_id=${
+        oauth2Config.clientId
+      }&redirect_uri=${redirectUri}&state=${stateQueryParameter}&response_type=code&scope=${encodeURIComponent(
+        oauth2Config.scopes.join(" "),
+      )}`;
+      window.location.href = authUrl;
     }
-    actionBtnLoadingState.setFinish();
   };
 
   return (
-    <div className="flex flex-row justify-center items-center w-full h-auto mt-12 sm:mt-24 bg-white dark:bg-zinc-900">
+    <div className="flex flex-row justify-center items-center w-full h-auto pt-12 sm:pt-24 bg-background">
       <div className="w-80 max-w-full h-full py-4 flex flex-col justify-start items-center">
         <div className="w-full py-4 grow flex flex-col justify-center items-center">
           <div className="flex flex-row justify-start items-center w-auto mx-auto gap-y-2 mb-4">
-            <Icon.CircleSlash className="w-12 h-auto dark:text-gray-500 mr-2" strokeWidth={1.5} />
-            <span className="text-3xl opacity-80 dark:text-gray-500">Slash</span>
+            <Logo className="mr-2" />
+            <span className="text-3xl text-foreground opacity-80">Slash</span>
           </div>
-          <form className="w-full mt-6" onSubmit={handleSigninBtnClick}>
-            <div className={`flex flex-col justify-start items-start w-full ${actionBtnLoadingState.isLoading ? "opacity-80" : ""}`}>
-              <div className="w-full flex flex-col mb-2">
-                <span className="leading-8 mb-1 text-gray-600">{t("common.email")}</span>
-                <Input
-                  className="w-full py-3"
-                  type="email"
-                  value={email}
-                  placeholder="steven@slash.com"
-                  onChange={handleEmailInputChanged}
-                />
-              </div>
-              <div className="w-full flex flex-col mb-2">
-                <span className="leading-8 text-gray-600">{t("common.password")}</span>
-                <Input className="w-full py-3" type="password" value={password} placeholder="····" onChange={handlePasswordInputChanged} />
-              </div>
-            </div>
-            <div className="w-full flex flex-row justify-end items-center mt-4 space-x-2">
-              <Button
-                className="w-full"
-                type="submit"
-                color="primary"
-                loading={actionBtnLoadingState.isLoading}
-                disabled={actionBtnLoadingState.isLoading || !allowConfirm}
-                onClick={handleSigninBtnClick}
-              >
-                {t("auth.sign-in")}
-              </Button>
-            </div>
-          </form>
-          {workspaceStore.profile.enableSignup && (
+          {!workspaceStore.setting.disallowPasswordAuth ? (
+            <PasswordAuthForm />
+          ) : (
+            <p className="w-full text-2xl mt-2 text-muted-foreground">Password auth is not allowed.</p>
+          )}
+          {!workspaceStore.setting.disallowUserRegistration && !workspaceStore.setting.disallowPasswordAuth && (
             <p className="w-full mt-4 text-sm">
-              <span className="dark:text-gray-500">{"Don't have an account yet?"}</span>
-              <Link className="cursor-pointer ml-2 text-blue-600 hover:underline" to="/auth/signup" unstable_viewTransition>
+              <span className="text-muted-foreground">{"Don't have an account yet?"}</span>
+              <Link className="cursor-pointer ml-2 text-primary hover:underline" to="/auth/signup" viewTransition>
                 {t("auth.sign-up")}
               </Link>
             </p>
+          )}
+          {workspaceStore.setting.identityProviders.length > 0 && (
+            <>
+              <div className="w-full flex items-center my-4">
+                <Separator className="flex-1" />
+                <span className="px-2 text-sm text-muted-foreground">{t("common.or")}</span>
+                <Separator className="flex-1" />
+              </div>
+              <div className="w-full flex flex-col space-y-2">
+                {workspaceStore.setting.identityProviders.map((identityProvider) => (
+                  <Button
+                    key={identityProvider.id}
+                    variant="outline"
+                    className="w-full"
+                    size="default"
+                    onClick={() => handleSignInWithIdentityProvider(identityProvider)}
+                  >
+                    {t("auth.sign-in-with", { provider: identityProvider.title })}
+                  </Button>
+                ))}
+              </div>
+            </>
           )}
         </div>
       </div>

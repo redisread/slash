@@ -1,14 +1,18 @@
-import { Button, DialogActions, DialogContent, DialogTitle, Drawer, Input, ModalClose, Radio, RadioGroup } from "@mui/joy";
 import { isUndefined } from "lodash-es";
 import { useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Sheet, SheetBody, SheetContent, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import useLoading from "@/hooks/useLoading";
 import { useCollectionStore, useShortcutStore, useWorkspaceStore } from "@/stores";
 import { Collection } from "@/types/proto/api/v1/collection_service";
 import { Visibility } from "@/types/proto/api/v1/common";
 import { Shortcut } from "@/types/proto/api/v1/shortcut_service";
-import { convertVisibilityFromPb } from "@/utils/visibility";
 import Icon from "./Icon";
 import ShortcutView from "./ShortcutView";
 
@@ -30,7 +34,7 @@ const CreateCollectionDrawer: React.FC<Props> = (props: Props) => {
   const shortcutList = useShortcutStore().getShortcutList();
   const [state, setState] = useState<State>({
     collectionCreate: Collection.fromPartial({
-      visibility: Visibility.PRIVATE,
+      visibility: Visibility.WORKSPACE,
     }),
   });
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -39,11 +43,8 @@ const CreateCollectionDrawer: React.FC<Props> = (props: Props) => {
   const loadingState = useLoading(!isCreating);
   const requestState = useLoading(false);
   const unselectedShortcuts = shortcutList
+    .filter((shortcut) => `${shortcut.title} ${shortcut.description}`.toLowerCase().includes(searchTerm.trim().toLowerCase()))
     .filter((shortcut) => {
-      if (!( searchTerm === null || searchTerm === undefined || searchTerm.trim() === "")) {
-        return shortcut.title.toLowerCase().includes(searchTerm.toLowerCase())
-        || shortcut.description.toLowerCase().includes(searchTerm.toLowerCase()) ;
-      }
       if (state.collectionCreate.visibility === Visibility.PUBLIC) {
         return shortcut.visibility === Visibility.PUBLIC;
       } else if (state.collectionCreate.visibility === Visibility.WORKSPACE) {
@@ -113,14 +114,6 @@ const CreateCollectionDrawer: React.FC<Props> = (props: Props) => {
     });
   };
 
-  const handleVisibilityInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPartialState({
-      collectionCreate: Object.assign(state.collectionCreate, {
-        visibility: e.target.value,
-      }),
-    });
-  };
-
   const handleDescriptionInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPartialState({
       collectionCreate: Object.assign(state.collectionCreate, {
@@ -171,127 +164,123 @@ const CreateCollectionDrawer: React.FC<Props> = (props: Props) => {
   };
 
   const handleSearchTermInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-
     setSearchTerm(e.target.value);
   };
 
   return (
-    <Drawer anchor="right" open={true} onClose={onClose}>
-      <DialogTitle>{isCreating ? "Create Collection" : "Edit Collection"}</DialogTitle>
-      <ModalClose />
-      <DialogContent className="w-full max-w-full">
-        <div className="overflow-y-auto w-full mt-2 px-4 pb-4 sm:w-[24rem]">
-          <div className="w-full flex flex-col justify-start items-start mb-3">
-            <span className="mb-2">
-              Name <span className="text-red-600">*</span>
-            </span>
-            <Input
-              className="w-full"
-              type="text"
-              placeholder="The memorable name of the collection"
-              value={state.collectionCreate.name}
-              onChange={handleNameInputChange}
-            />
-          </div>
-          <div className="w-full flex flex-col justify-start items-start mb-3">
-            <span className="mb-2">
-              Title <span className="text-red-600">*</span>
-            </span>
-            <div className="relative w-full">
+    <Sheet open={true} onOpenChange={onClose}>
+      <SheetContent className="w-full sm:max-w-md">
+        <SheetHeader>
+          <SheetTitle>{isCreating ? "Create Collection" : "Edit Collection"}</SheetTitle>
+        </SheetHeader>
+        <SheetBody>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">
+                Name <span className="text-destructive">*</span>
+              </Label>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">c/</span>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="An easy name to remember"
+                  value={state.collectionCreate.name}
+                  onChange={handleNameInputChange}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="title">
+                Title <span className="text-destructive">*</span>
+              </Label>
               <Input
-                className="w-full"
+                id="title"
                 type="text"
-                placeholder="A short title to describe your collection"
+                placeholder="A short title of your collection"
                 value={state.collectionCreate.title}
                 onChange={handleTitleInputChange}
               />
             </div>
-          </div>
-          <div className="w-full flex flex-col justify-start items-start mb-3">
-            <span className="mb-2">Description</span>
-            <div className="relative w-full">
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
               <Input
-                className="w-full"
+                id="description"
                 type="text"
                 placeholder="A slightly longer description"
                 value={state.collectionCreate.description}
                 onChange={handleDescriptionInputChange}
               />
             </div>
-          </div>
-          <div className="w-full flex flex-col justify-start items-start mb-3">
-            <span className="mb-2">Visibility</span>
-            <div className="w-full flex flex-row justify-start items-center text-base">
-              <RadioGroup orientation="horizontal" value={state.collectionCreate.visibility} onChange={handleVisibilityInputChange}>
-                <Radio value={Visibility.PRIVATE} label={t(`shortcut.visibility.private.self`)} />
-                <Radio value={Visibility.WORKSPACE} label={t(`shortcut.visibility.workspace.self`)} />
-                <Radio value={Visibility.PUBLIC} label={t(`shortcut.visibility.public.self`)} />
-              </RadioGroup>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="public"
+                checked={state.collectionCreate.visibility === Visibility.PUBLIC}
+                onCheckedChange={(checked) =>
+                  setPartialState({
+                    collectionCreate: Object.assign(state.collectionCreate, {
+                      visibility: checked ? Visibility.PUBLIC : Visibility.WORKSPACE,
+                    }),
+                  })
+                }
+              />
+              <Label htmlFor="public" className="text-sm font-normal cursor-pointer">
+                {t(`shortcut.visibility.public.description`)}
+              </Label>
             </div>
-            <p className="mt-3 text-sm text-gray-500 w-full bg-gray-100 border border-gray-200 dark:bg-zinc-800 dark:border-zinc-700 dark:text-gray-400 px-2 py-1 rounded-md">
-              {t(`shortcut.visibility.${convertVisibilityFromPb(state.collectionCreate.visibility).toLowerCase()}.description`)}
-            </p>
-          </div>
-          <div className="w-full flex flex-col justify-start items-start mb-3">
-            <p className="mb-2">
-              <span>Shortcuts</span>
-              <span className="opacity-60">({selectedShortcuts.length})</span>
-              {selectedShortcuts.length === 0 && <span className="ml-2 italic opacity-80 text-sm">(Select a shortcut first)</span>}
-            </p>
-            <Input
-              className="w-full"
-              type="text"
-              placeholder="Search for shortcuts"
-              startDecorator={<Icon.Search className="w-4 h-auto" />}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <div className="w-full py-1 px-px flex flex-row justify-start items-start flex-wrap overflow-hidden gap-2">
-              {selectedShortcuts.map((shortcut) => {
-                return (
-                  <ShortcutView
-                    key={shortcut.id}
-                    className="!w-auto select-none max-w-[40%] cursor-pointer bg-gray-100 shadow dark:bg-zinc-800 dark:border-zinc-700 dark:text-gray-400"
-                    shortcut={shortcut}
-                    onClick={() => {
-                      setSelectedShortcuts([...selectedShortcuts.filter((selectedShortcut) => selectedShortcut.id !== shortcut.id)]);
-                    }}
-                  />
-                );
-              })}
-              {unselectedShortcuts.map((shortcut) => {
-                return (
-                  <ShortcutView
-                    key={shortcut.id}
-                    className="!w-auto select-none max-w-[40%] border-dashed cursor-pointer"
-                    shortcut={shortcut}
-                    onClick={() => {
-                      setSelectedShortcuts([...selectedShortcuts, shortcut]);
-                    }}
-                  />
-                );
-              })}
-              {selectedShortcuts.length + unselectedShortcuts.length === 0 && (
-                <div className="w-full flex flex-row justify-center items-center text-gray-400">
-                  <Icon.PackageOpen className="w-6 h-auto" />
-                  <p className="ml-2">No shortcuts found.</p>
-                </div>
-              )}
+            <Separator />
+            <div className="space-y-2">
+              <div className="flex items-baseline gap-2">
+                <Label>Shortcuts</Label>
+                <span className="text-sm text-muted-foreground">({selectedShortcuts.length})</span>
+                {selectedShortcuts.length === 0 && <span className="text-sm italic text-muted-foreground">(Select a shortcut first)</span>}
+              </div>
+              <Input aria-label="搜索链接" placeholder="搜索标题或描述" value={searchTerm} onChange={handleSearchTermInputChange} />
+              <div className="w-full py-1 px-px flex flex-row justify-start items-start flex-wrap gap-2">
+                {selectedShortcuts.map((shortcut) => {
+                  return (
+                    <ShortcutView
+                      key={shortcut.id}
+                      className="!w-auto select-none max-w-[40%] cursor-pointer bg-muted shadow"
+                      shortcut={shortcut}
+                      onClick={() => {
+                        setSelectedShortcuts([...selectedShortcuts.filter((selectedShortcut) => selectedShortcut.id !== shortcut.id)]);
+                      }}
+                    />
+                  );
+                })}
+                {unselectedShortcuts.map((shortcut) => {
+                  return (
+                    <ShortcutView
+                      key={shortcut.id}
+                      className="!w-auto select-none max-w-[40%] border-dashed cursor-pointer"
+                      shortcut={shortcut}
+                      onClick={() => {
+                        setSelectedShortcuts([...selectedShortcuts, shortcut]);
+                      }}
+                    />
+                  );
+                })}
+                {selectedShortcuts.length + unselectedShortcuts.length === 0 && (
+                  <div className="w-full flex flex-row justify-center items-center text-muted-foreground">
+                    <Icon.PackageOpen className="w-6 h-auto" />
+                    <p className="ml-2">No shortcuts found.</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </DialogContent>
-      <DialogActions>
-        <div className="w-full flex flex-row justify-end items-center px-3 py-4 space-x-2">
-          <Button color="neutral" variant="plain" disabled={requestState.isLoading} loading={requestState.isLoading} onClick={onClose}>
+        </SheetBody>
+        <SheetFooter>
+          <Button variant="outline" disabled={requestState.isLoading} onClick={onClose}>
             {t("common.cancel")}
           </Button>
-          <Button color="primary" disabled={requestState.isLoading} loading={requestState.isLoading} onClick={handleSaveBtnClick}>
-            {t("common.save")}
+          <Button disabled={requestState.isLoading} onClick={handleSaveBtnClick}>
+            {requestState.isLoading ? "Saving..." : t("common.save")}
           </Button>
-        </div>
-      </DialogActions>
-    </Drawer>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 };
 

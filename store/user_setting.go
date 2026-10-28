@@ -35,7 +35,9 @@ func (s *Store) ListUserSettings(ctx context.Context, find *FindUserSetting) ([]
 func (s *Store) GetUserSetting(ctx context.Context, find *FindUserSetting) (*storepb.UserSetting, error) {
 	if find.UserID != nil && find.Key != storepb.UserSettingKey_USER_SETTING_KEY_UNSPECIFIED {
 		if cache, ok := s.userSettingCache.Load(getUserSettingCacheKey(*find.UserID, find.Key.String())); ok {
-			return cache.(*storepb.UserSetting), nil
+			if userSetting, ok := cache.(*storepb.UserSetting); ok {
+				return userSetting, nil
+			}
 		}
 	}
 
@@ -54,16 +56,16 @@ func (s *Store) GetUserSetting(ctx context.Context, find *FindUserSetting) (*sto
 }
 
 // GetUserAccessTokens returns the access tokens of the user.
-func (s *Store) GetUserAccessTokens(ctx context.Context, userID int32) ([]*storepb.AccessTokensUserSetting_AccessToken, error) {
+func (s *Store) GetUserAccessTokens(ctx context.Context, userID int32) ([]*storepb.UserSetting_AccessTokensSetting_AccessToken, error) {
 	userSetting, err := s.GetUserSetting(ctx, &FindUserSetting{
 		UserID: &userID,
-		Key:    storepb.UserSettingKey_ACCESS_TOKENS,
+		Key:    storepb.UserSettingKey_USER_SETTING_ACCESS_TOKENS,
 	})
 	if err != nil {
 		return nil, err
 	}
 	if userSetting == nil {
-		return []*storepb.AccessTokensUserSetting_AccessToken{}, nil
+		return []*storepb.UserSetting_AccessTokensSetting_AccessToken{}, nil
 	}
 
 	accessTokensUserSetting := userSetting.GetAccessTokens()

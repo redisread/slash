@@ -3,6 +3,8 @@ package store
 import (
 	"context"
 
+	"github.com/pkg/errors"
+
 	storepb "github.com/yourselfhosted/slash/proto/gen/store"
 )
 
@@ -33,7 +35,9 @@ func (s *Store) ListWorkspaceSettings(ctx context.Context, find *FindWorkspaceSe
 func (s *Store) GetWorkspaceSetting(ctx context.Context, find *FindWorkspaceSetting) (*storepb.WorkspaceSetting, error) {
 	if find.Key != storepb.WorkspaceSettingKey_WORKSPACE_SETTING_KEY_UNSPECIFIED {
 		if cache, ok := s.workspaceSettingCache.Load(find.Key); ok {
-			return cache.(*storepb.WorkspaceSetting), nil
+			if workspaceSetting, ok := cache.(*storepb.WorkspaceSetting); ok {
+				return workspaceSetting, nil
+			}
 		}
 	}
 
@@ -41,7 +45,6 @@ func (s *Store) GetWorkspaceSetting(ctx context.Context, find *FindWorkspaceSett
 	if err != nil {
 		return nil, err
 	}
-
 	if len(list) == 0 {
 		return nil, nil
 	}
@@ -49,4 +52,43 @@ func (s *Store) GetWorkspaceSetting(ctx context.Context, find *FindWorkspaceSett
 	workspaceSetting := list[0]
 	s.workspaceSettingCache.Store(workspaceSetting.Key, workspaceSetting)
 	return workspaceSetting, nil
+}
+
+func (s *Store) DeleteWorkspaceSetting(ctx context.Context, key storepb.WorkspaceSettingKey) error {
+	if err := s.driver.DeleteWorkspaceSetting(ctx, key); err != nil {
+		return errors.Wrap(err, "failed to delete workspace setting")
+	}
+	s.workspaceSettingCache.Delete(key)
+	return nil
+}
+
+func (s *Store) GetWorkspaceGeneralSetting(ctx context.Context) (*storepb.WorkspaceSetting_GeneralSetting, error) {
+	setting, err := s.GetWorkspaceSetting(ctx, &FindWorkspaceSetting{
+		Key: storepb.WorkspaceSettingKey_WORKSPACE_SETTING_GENERAL,
+	})
+	if err != nil {
+		return nil, err
+	}
+	generalSetting := &storepb.WorkspaceSetting_GeneralSetting{}
+	if setting != nil && setting.GetGeneral() != nil {
+		generalSetting = setting.GetGeneral()
+	}
+	return generalSetting, nil
+}
+
+func (s *Store) GetWorkspaceSecuritySetting(ctx context.Context) (*storepb.WorkspaceSetting_SecuritySetting, error) {
+	setting, err := s.GetWorkspaceSetting(ctx, &FindWorkspaceSetting{
+		Key: storepb.WorkspaceSettingKey_WORKSPACE_SETTING_SECURITY,
+	})
+	if err != nil {
+		return nil, err
+	}
+	securitySetting := &storepb.WorkspaceSetting_SecuritySetting{
+		DisallowUserRegistration: false,
+		DisallowPasswordAuth:     false,
+	}
+	if setting != nil && setting.GetSecurity() != nil {
+		securitySetting = setting.GetSecurity()
+	}
+	return securitySetting, nil
 }

@@ -159,7 +159,6 @@ const IndexOptions = () => {
               <span className="dark:text-gray-400">Default Visibility</span>
             </div>
             <Select defaultValue={context.defaultVisibility} onChange={(_, value) => handleDefaultVisibilitySelect(value as Visibility)}>
-              <Option value={Visibility.PRIVATE}>Private</Option>
               <Option value={Visibility.WORKSPACE}>Workspace</Option>
               <Option value={Visibility.PUBLIC}>Public</Option>
             </Select>

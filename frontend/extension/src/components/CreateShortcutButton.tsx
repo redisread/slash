@@ -4,7 +4,6 @@ import { toast } from "react-hot-toast";
 import { useStorageContext } from "@/context";
 import { useShortcutStore } from "@/stores";
 import type { Visibility } from "@/types/proto/api/v1/common";
-import { Shortcut } from "@/types/proto/api/v1/shortcut_service";
 import Icon from "./Icon";
 
 interface State {
@@ -100,17 +99,13 @@ const CreateShortcutButton = () => {
     setIsLoading(true);
     try {
       const tags = tag.split(" ").filter(Boolean);
-      await shortcutStore.createShortcut(
-        context.instanceUrl,
-        context.accessToken,
-        Shortcut.fromPartial({
-          name: state.name,
-          title: state.title,
-          link: state.link,
-          tags,
-          visibility: context.defaultVisibility as Visibility,
-        }),
-      );
+      await shortcutStore.createShortcut(context.instanceUrl, context.accessToken, {
+        name: state.name,
+        title: state.title,
+        link: state.link,
+        tags,
+        visibility: context.defaultVisibility as Visibility,
+      });
       toast.success("Shortcut created successfully");
       setShowModal(false);
     } catch (error: any) {

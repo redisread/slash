@@ -33,10 +33,6 @@
   "shortcut": {
     "visits": "{{count}} visites",
     "visibility": {
-      "private": {
-        "self": "Privé",
-        "description": "Vous seul pouvez accéder"
-      },
       "workspace": {
         "self": "Espace de travail",
         "description": "Les membres de l'espace de travail ont accès"
@@ -72,7 +68,6 @@
     },
     "workspace": {
       "self": "Paramètres de l'espace de travail",
-      "custom-style": "Style personnalisé",
       "enable-user-signup": {
         "self": "Activer l'inscription des utilisateurs",
         "description": "Une fois activé, d'autres utilisateurs peuvent s'inscrire."

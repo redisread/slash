@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
 import { useViewStore } from "@/stores";
-import { convertVisibilityFromPb } from "@/utils/visibility";
 import Icon from "./Icon";
 import VisibilityIcon from "./VisibilityIcon";
 
@@ -16,10 +15,10 @@ const FilterView = () => {
 
   return (
     <div className="w-full flex flex-row justify-start items-center mb-4 pl-2">
-      <span className="text-gray-400">Filters:</span>
+      <span className="text-muted-foreground">Filters:</span>
       {filter.tag && (
         <button
-          className="ml-2 px-2 py-1 flex flex-row justify-center items-center bg-gray-100 rounded-full text-gray-500 text-sm hover:line-through"
+          className="ml-2 px-2 py-1 flex flex-row justify-center items-center bg-muted rounded-full text-muted-foreground text-sm hover:line-through"
           onClick={() => viewStore.setFilter({ tag: undefined })}
         >
           <Icon.Tag className="w-4 h-auto mr-1" />
@@ -29,11 +28,11 @@ const FilterView = () => {
       )}
       {filter.visibility && (
         <button
-          className="ml-2 px-2 py-1 flex flex-row justify-center items-center bg-gray-100 rounded-full text-gray-500 text-sm hover:line-through"
+          className="ml-2 px-2 py-1 flex flex-row justify-center items-center bg-muted rounded-full text-muted-foreground text-sm hover:line-through"
           onClick={() => viewStore.setFilter({ visibility: undefined })}
         >
           <VisibilityIcon className="w-4 h-auto mr-1" visibility={filter.visibility} />
-          {t(`shortcut.visibility.${convertVisibilityFromPb(filter.visibility).toLowerCase()}.self`)}
+          {t(`shortcut.visibility.${filter.visibility.toLowerCase()}.self`)}
           <Icon.X className="w-4 h-auto ml-1" />
         </button>
       )}

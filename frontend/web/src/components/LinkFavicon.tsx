@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useWorkspaceStore } from "@/stores";
 import Icon from "./Icon";
 
 interface Props {
@@ -10,6 +9,7 @@ const getFaviconUrlWithProvider = (url: string, provider: string) => {
   try {
     const searchParams = new URLSearchParams();
     searchParams.set("domain", new URL(url).hostname);
+    searchParams.set("sz", "64");
     return new URL(`?${searchParams.toString()}`, provider).toString();
   } catch (error) {
     return "";
@@ -18,8 +18,7 @@ const getFaviconUrlWithProvider = (url: string, provider: string) => {
 
 const LinkFavicon = (props: Props) => {
   const { url } = props;
-  const workspaceStore = useWorkspaceStore();
-  const faviconProvider = workspaceStore.profile.faviconProvider || "https://www.google.com/s2/favicons";
+  const faviconProvider = "https://www.google.com/s2/favicons";
   const [faviconUrl, setFaviconUrl] = useState<string>(getFaviconUrlWithProvider(url, faviconProvider));
 
   const handleImgError = () => {
@@ -29,7 +28,7 @@ const LinkFavicon = (props: Props) => {
   return faviconUrl ? (
     <img className="w-full h-auto rounded" src={faviconUrl} decoding="async" loading="lazy" onError={handleImgError} />
   ) : (
-    <Icon.CircleSlash className="w-full h-auto text-gray-400" strokeWidth={1.5} />
+    <Icon.CircleSlash className="w-full h-auto text-muted-foreground" strokeWidth={1.5} />
   );
 };
 

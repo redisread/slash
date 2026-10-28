@@ -12,14 +12,16 @@
     "search": "Search",
     "email": "Email",
     "password": "Password",
-    "account": "Account"
+    "account": "Account",
+    "or": "Or"
   },
   "auth": {
     "sign-in": "Sign in",
     "sign-up": "Sign up",
     "sign-out": "Sign out",
     "create-your-account": "Create your account",
-    "host-tip": "You are registering as Admin."
+    "host-tip": "You are registering as Admin.",
+    "sign-in-with": "Sign in with {{provider}}"
   },
   "analytics": {
     "self": "Analytics",
@@ -34,23 +36,19 @@
   "shortcut": {
     "visits": "{{count}} visits",
     "visibility": {
-      "private": {
-        "self": "Private",
-        "description": "Only you can access"
-      },
       "workspace": {
         "self": "Workspace",
         "description": "Workspace members can access"
       },
       "public": {
         "self": "Public",
-        "description": "Visible to everyone on the internet"
+        "description": "Public on the internet"
       }
     }
   },
   "filter": {
     "all": "All",
-    "mine": "Mine",
+    "personal": "Personal",
     "compact-mode": "Compact mode",
     "order-by": "Order by",
     "direction": "Direction"
@@ -60,10 +58,7 @@
     "nickname": "Nickname",
     "email": "Email",
     "role": "Role",
-    "profile": "Profile",
-    "action": {
-      "add-user": "Add user"
-    }
+    "profile": "Profile"
   },
   "settings": {
     "self": "Setting",
@@ -73,12 +68,14 @@
     },
     "workspace": {
       "self": "Workspace settings",
-      "custom-style": "Custom style",
-      "enable-user-signup": {
-        "self": "Enable user signup",
-        "description": "Once enabled, other users can signup."
+      "disallow-user-registration": {
+        "self": "Disallow user registration"
       },
-      "default-visibility": "Default visibility"
+      "default-visibility": "Default visibility",
+      "member": {
+        "self": "Member",
+        "add": "Add member"
+      }
     }
   }
 }

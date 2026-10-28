@@ -10,45 +10,30 @@ message UserSetting {
   UserSettingKey key = 2;
 
   oneof value {
-    AccessTokensUserSetting access_tokens = 3;
+    GeneralSetting general = 3;
+    AccessTokensSetting access_tokens = 4;
+  }
 
-    LocaleUserSetting locale = 4;
+  message GeneralSetting {
+    string locale = 1;
+    string color_theme = 2;
+  }
 
-    ColorThemeUserSetting color_theme = 5;
+  message AccessTokensSetting {
+    message AccessToken {
+      // The access token is a JWT token, including expiration time, issuer, etc.
+      string access_token = 1;
+      // A description for the access token.
+      string description = 2;
+    }
+    repeated AccessToken access_tokens = 1; // Nested repeated field
   }
 }
 
 enum UserSettingKey {
   USER_SETTING_KEY_UNSPECIFIED = 0;
-  // Access tokens for the user.
-  ACCESS_TOKENS = 1;
-  // Locale for the user.
-  LOCALE = 2;
-  // Color theme for the user.
-  COLOR_THEME = 3;
-}
-
-message AccessTokensUserSetting {
-  message AccessToken {
-    // The access token is a JWT token.
-    // Including expiration time, issuer, etc.
-    string access_token = 1;
-    // A description for the access token.
-    string description = 2;
-  }
-  repeated AccessToken access_tokens = 1;
-}
-
-enum LocaleUserSetting {
-  LOCALE_USER_SETTING_UNSPECIFIED = 0;
-  EN = 1;
-  ZH = 2;
-  FR = 3;
-}
-
-enum ColorThemeUserSetting {
-  COLOR_THEME_USER_SETTING_UNSPECIFIED = 0;
-  SYSTEM = 1;
-  LIGHT = 2;
-  DARK = 3;
+  // User general settings.
+  USER_SETTING_GENERAL = 1;
+  // User access tokens.
+  USER_SETTING_ACCESS_TOKENS = 2;
 }
